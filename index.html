@@ -122,7 +122,7 @@
       50% { opacity: 1; }
     }
 
-    /* Spinner Button Styles - Only visible on spinner page */
+    /* Spinner Button Styles */
     .spinner-section {
       margin-top: 25px;
       padding-top: 20px;
@@ -244,25 +244,6 @@
         opacity: 0;
       }
     }
-
-    /* Spinner link button */
-    .spinner-link-btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #ff9800, #ff5722);
-      color: white;
-      text-decoration: none;
-      padding: 12px 24px;
-      border-radius: 50px;
-      font-weight: bold;
-      margin-top: 15px;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(255,87,34,0.4);
-    }
-
-    .spinner-link-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 25px rgba(255,87,34,0.6);
-    }
   </style>
 </head>
 <body>
@@ -299,6 +280,7 @@
 </div>
 
 <script>
+// YOUR GOOGLE APPS SCRIPT URL
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTAI9jNz5_f1zmHltGgYztCN2fkrQpvaXjuJslX2vOHquKoLi2zLfVF0v-NPvQZQ56/exec";
 
 // Store all students data
@@ -353,10 +335,24 @@ function displayStudent(student) {
 
 // Load student data
 function loadStudentData() {
-  fetch(SHEET_URL)
+  // Build the URL based on whether we have an ID
+  let url = SHEET_URL;
+  if (id && !isSpinnerMode) {
+    url = SHEET_URL + "?id=" + encodeURIComponent(id);
+  }
+  
+  fetch(url)
     .then(res => res.json())
     .then(data => {
-      if (Array.isArray(data)) {
+      console.log("Data received:", data); // For debugging
+      
+      // Check if we got a single student object (when ID was provided)
+      if (data && data.name && !Array.isArray(data)) {
+        allStudents = [data];
+        displayStudent(data);
+      }
+      // Check if we got an array of students
+      else if (Array.isArray(data) && data.length > 0) {
         allStudents = data;
         
         if (isSpinnerMode) {
@@ -369,37 +365,40 @@ function loadStudentData() {
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
           displayStudent(randomStudent);
         } else if (id) {
-          // Normal mode with specific ID
-          const student = allStudents.find(s => s.id == id);
+          // Normal mode with specific ID - find the student
+          const student = allStudents.find(s => String(s.id) === String(id));
           if (student) {
             displayStudent(student);
           } else {
             document.getElementById("studentName").innerText = "Student Not Found";
+            document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=❌+Not+Found";
           }
         } else {
           // Normal mode without ID - show random
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
           displayStudent(randomStudent);
         }
-      } else if (data.name) {
-        allStudents = [data];
-        displayStudent(data);
+      } else {
+        // No data received
+        console.error("No data received");
+        document.getElementById("studentName").innerText = "No Data Available";
+        document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=📭+No+Data";
       }
     })
     .catch(err => {
-      console.error(err);
-      document.getElementById("studentName").innerText = "Welcome!";
-      document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=✨+Happy+Mother's+Day";
+      console.error("Fetch error:", err);
+      document.getElementById("studentName").innerText = "Connection Error";
+      document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=⚠️+Error";
     });
 }
 
 // Spinner functions
 function updateRemainingCount() {
-  const remainingCount = document.getElementById('remainingCount');
+  const remainingCountElem = document.getElementById('remainingCount');
   if (remainingStudents.length > 0) {
-    remainingCount.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
+    remainingCountElem.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
   } else {
-    remainingCount.innerHTML = '🎉 All done! Resetting... 🎉';
+    remainingCountElem.innerHTML = '🎉 All done! Resetting... 🎉';
     remainingStudents = [...allStudents];
   }
 }
