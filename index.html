@@ -319,11 +319,11 @@ function displayStudent(student) {
   
   // Try multiple photo formats
   const img = document.getElementById("studentPhoto");
-  img.src = `photos/${student.id}.jpg`;
+  img.src = `photos/${student.id}.JPG`;
   img.onerror = () => {
     img.src = `photos/${student.id}.png`;
     img.onerror = () => {
-      img.src = `photos/${student.id}.jpeg`;
+      img.src = `photos/${student.id}.JPG`;
       img.onerror = () => {
         img.src = `https://via.placeholder.com/320x320?text=${encodeURIComponent(student.name || '❤️')}`;
       };
