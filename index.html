@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Happy Mother's Day</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,7 +16,7 @@
       padding: 15px;
     }
     .card {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255,255,255,0.95);
       width: 100%;
       max-width: 500px;
       border-radius: 35px;
@@ -24,7 +24,7 @@
       text-align: center;
       box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
-    h1 { color: #e91e63; margin-bottom: 15px; }
+    h1 { color: #e91e63; margin-bottom: 15px; font-size: 1.8em; }
     .photo {
       width: 100%;
       max-width: 280px;
@@ -47,18 +47,6 @@
     }
     .message { font-size: 16px; margin-top: 15px; color: #555; }
     .footer { margin-top: 20px; color: #999; font-size: 14px; }
-    .debug {
-      margin-top: 20px;
-      padding: 10px;
-      background: #f8f9fa;
-      border-radius: 10px;
-      font-size: 11px;
-      text-align: left;
-      color: #333;
-      word-break: break-all;
-      max-height: 150px;
-      overflow-y: auto;
-    }
     .spinner-section { margin-top: 25px; border-top: 2px dashed #ffb6c1; padding-top: 20px; }
     .wheel {
       width: 220px;
@@ -66,14 +54,15 @@
       border-radius: 50%;
       background: conic-gradient(from 0deg, #e91e63 0deg 45deg, #ff6b9d 45deg 90deg, #ffb6c1 90deg 135deg, #ff1493 135deg 180deg, #e91e63 180deg 225deg, #ff6b9d 225deg 270deg, #ffb6c1 270deg 315deg, #ff1493 315deg 360deg);
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      margin: 0 auto;
-      cursor: grab;
+      margin: 10px auto;
+      cursor: pointer;
+      transition: transform 1.5s cubic-bezier(0.33,1,0.68,1);
     }
-    .pointer { position: relative; top: -20px; font-size: 35px; }
-    .spin-result { margin-top: 15px; color: #e91e63; font-weight: bold; }
+    .pointer { font-size: 35px; margin-bottom: -10px; }
+    .spin-result { margin-top: 15px; color: #e91e63; font-weight: bold; min-height: 50px; }
     .remaining { font-size: 12px; color: #999; margin-top: 10px; }
     .reset-btn { background: rgba(233,30,99,0.1); border: 1px solid #e91e63; color: #e91e63; padding: 6px 12px; border-radius: 20px; margin-top: 10px; cursor: pointer; }
-    @media (max-width: 480px) { .name { font-size: 24px; } .wheel { width: 200px; height: 200px; } }
+    @media (max-width: 480px) { .name { font-size: 24px; } .wheel { width: 200px; height: 200px; } .pointer { font-size: 28px; } }
   </style>
 </head>
 <body>
@@ -90,15 +79,14 @@
       <div class="wheel" id="wheel"></div>
       <div class="spin-result" id="spinResult"></div>
       <div class="remaining" id="remainingCount"></div>
-      <button class="reset-btn" id="resetBtn">⟳ Reset</button>
+      <button class="reset-btn" id="resetBtn">⟳ Reset Wheel</button>
     </div>
   </div>
-
-  <div class="debug" id="debug"></div>
 </div>
 
 <script>
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTAI9jNz5_f1zmHltGgYztCN2fkrQpvaXjuJslX2vOHquKoLi2zLfVF0v-NPvQZQ56/exec";
+// IMPORTANT: Replace this with your NEW Apps Script URL after redeploying
+const SHEET_URL = "https://script.google.com/macros/s/YOUR_NEW_URL/exec";
 
 let allStudents = [];
 let remainingStudents = [];
@@ -109,21 +97,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const idParam = urlParams.get("id");
 
-function debug(msg) {
-  console.log(msg);
-  const debugDiv = document.getElementById('debug');
-  if (debugDiv) {
-    debugDiv.innerHTML += `<div>🔍 ${new Date().toLocaleTimeString()}: ${msg}</div>`;
-    debugDiv.scrollTop = debugDiv.scrollHeight;
-  }
-}
-
 function displayStudent(student) {
-  if (!student) { debug("No student to display"); return; }
-  debug(`Displaying: ${student.name} (ID: ${student.id})`);
+  if (!student) return;
   document.getElementById("studentName").innerText = student.name;
   const img = document.getElementById("studentPhoto");
-  const photoId = student.id || idParam;
+  const photoId = student.id;
   if (photoId) {
     img.src = `photos/${photoId}.JPG`;
     img.onerror = () => { img.src = `photos/${photoId}.jpg`; };
@@ -133,104 +111,96 @@ function displayStudent(student) {
 }
 
 function loadData() {
-  debug("Fetching data from Apps Script...");
-  fetch(SHEET_URL)
-    .then(res => {
-      debug(`HTTP status: ${res.status}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      debug(`Response type: ${Array.isArray(data) ? 'Array' : typeof data}`);
-      debug(`Response sample: ${JSON.stringify(data).substring(0, 200)}`);
-      
-      // Case 1: Array of students
-      if (Array.isArray(data) && data.length > 0) {
-        allStudents = data;
-        debug(`Loaded ${allStudents.length} students. First: ID=${allStudents[0].id}, Name=${allStudents[0].name}`);
-        
-        if (isSpinnerMode) {
-          document.getElementById('spinnerContainer').style.display = 'block';
-          remainingStudents = [...allStudents];
-          document.getElementById('remainingCount').innerText = `🎯 ${remainingStudents.length} students remaining`;
-          const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-          displayStudent(randomStudent);
-        } else if (idParam) {
-          // Try to find student by ID
-          const student = allStudents.find(s => String(s.id) === String(idParam));
-          if (student) {
-            displayStudent(student);
+  if (idParam && !isSpinnerMode) {
+    // Single student
+    fetch(SHEET_URL + "?id=" + encodeURIComponent(idParam))
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.name && data.name !== "Student Not Found" && data.error !== "Student not found") {
+          displayStudent(data);
+        } else {
+          document.getElementById("studentName").innerText = "Student Not Found";
+        }
+      })
+      .catch(() => document.getElementById("studentName").innerText = "Error");
+  } else {
+    // All students (for spinner or random)
+    fetch(SHEET_URL)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          allStudents = data;
+          if (isSpinnerMode) {
+            document.getElementById("spinnerContainer").style.display = "block";
+            remainingStudents = [...allStudents];
+            document.getElementById("remainingCount").innerText = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
+            const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
+            displayStudent(randomStudent);
           } else {
-            debug(`Student with ID ${idParam} not found in array`);
-            document.getElementById("studentName").innerText = "Student Not Found";
+            const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
+            displayStudent(randomStudent);
           }
         } else {
-          const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-          displayStudent(randomStudent);
+          document.getElementById("studentName").innerText = "No Data";
         }
-      }
-      // Case 2: Single student object
-      else if (data && data.name) {
-        allStudents = [data];
-        debug(`Single student: ${data.name}, ID: ${data.id}`);
-        displayStudent(data);
-      }
-      else {
-        debug("No valid data received - array empty or wrong format");
-        document.getElementById("studentName").innerText = "No Data";
-      }
-    })
-    .catch(err => {
-      debug(`FETCH ERROR: ${err.message}`);
-      document.getElementById("studentName").innerText = "Connection Error";
-    });
+      })
+      .catch(() => document.getElementById("studentName").innerText = "Connection Error");
+  }
 }
 
 // Spinner logic (only if in spinner mode)
 if (isSpinnerMode) {
   loadData();
-  
-  // Simple tap spin
-  const wheel = document.getElementById('wheel');
-  wheel.addEventListener('click', () => {
+
+  const wheel = document.getElementById("wheel");
+  const spinResult = document.getElementById("spinResult");
+  const remainingSpan = document.getElementById("remainingCount");
+
+  function spinWheel() {
     if (spinning) return;
-    if (remainingStudents.length === 0) {
+    if (remainingStudents.length === 0 && allStudents.length > 0) {
       remainingStudents = [...allStudents];
-      document.getElementById('remainingCount').innerText = `🎯 ${remainingStudents.length} students remaining`;
+      remainingSpan.innerText = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
+      spinResult.innerHTML = "🎊 Starting over! 🎊";
+      setTimeout(() => spinResult.innerHTML = "", 1500);
     }
+    if (remainingStudents.length === 0) return;
+
     const randomIndex = Math.floor(Math.random() * remainingStudents.length);
     const selected = remainingStudents[randomIndex];
     remainingStudents.splice(randomIndex, 1);
-    document.getElementById('remainingCount').innerText = remainingStudents.length > 0 ? `🎯 ${remainingStudents.length} students remaining` : "🎉 All done! Reset to continue 🎉";
-    
+    remainingSpan.innerText = remainingStudents.length > 0 ? `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining` : "🎉 All done! Reset to continue 🎉";
+
     spinning = true;
     const spins = 1440 + Math.random() * 720;
     wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
     wheel.style.transform = `rotate(${spins}deg)`;
     wheelAngle = spins;
+
     setTimeout(() => {
       spinning = false;
-      document.getElementById('spinResult').innerHTML = `✨ ${selected.name}! ✨`;
+      spinResult.innerHTML = `✨ ${selected.name}! ✨`;
       displayStudent(selected);
       wheel.style.transition = "";
       wheel.style.transform = `rotate(${spins % 360}deg)`;
       wheelAngle = spins % 360;
-      setTimeout(() => document.getElementById('spinResult').innerHTML = "", 3000);
+      setTimeout(() => spinResult.innerHTML = "", 2500);
     }, 1500);
-  });
-  
-  document.getElementById('resetBtn').addEventListener('click', () => {
+  }
+
+  wheel.addEventListener("click", spinWheel);
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
     remainingStudents = [...allStudents];
-    document.getElementById('remainingCount').innerText = `🎯 ${remainingStudents.length} students remaining`;
+    remainingSpan.innerText = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
     wheel.style.transition = "transform 0.5s ease";
     wheel.style.transform = "rotate(0deg)";
     wheelAngle = 0;
     setTimeout(() => wheel.style.transition = "", 500);
-    document.getElementById('spinResult').innerHTML = "⟳ Reset!";
-    setTimeout(() => document.getElementById('spinResult').innerHTML = "", 1500);
+    spinResult.innerHTML = "⟳ Reset!";
+    setTimeout(() => spinResult.innerHTML = "", 1500);
   });
 } else {
-  // Normal mode (non-spinner)
   loadData();
 }
 </script>
