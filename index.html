@@ -234,18 +234,6 @@
       100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
     }
 
-    .debug-info {
-      margin-top: 20px;
-      padding: 10px;
-      background: rgba(0,0,0,0.05);
-      border-radius: 10px;
-      font-size: 11px;
-      text-align: left;
-      color: #666;
-      word-break: break-all;
-      font-family: monospace;
-    }
-
     @media (max-width: 480px) {
       .card { padding: 20px 15px; }
       h1 { font-size: 1.5em; }
@@ -255,7 +243,6 @@
       .wheel { width: 150px; height: 150px; }
       .wheel::before { font-size: 24px; top: -25px; }
       .wheel::after { font-size: 18px; top: -12px; }
-      .debug-info { font-size: 10px; }
     }
   </style>
 </head>
@@ -278,13 +265,10 @@
       </div>
     </div>
   </div>
-
-  <!-- Debug panel to show what's happening -->
-  <div class="debug-info" id="debugInfo"></div>
 </div>
 
 <script>
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTAI9jNz5_f1zmHltGgYztCN2fkrQpvaXjuJslX2vOHquKoLi2zLfVF0v-NPvQZQ56/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbx8ViWEIG02LBFrg9PsXqgxblNn-y9mThHSz4byR0u6IoQ-yoaqLHsX4qdywoM7aV1h/exec";
 
 let allStudents = [];
 let remainingStudents = [];
@@ -294,16 +278,6 @@ const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const idParam = urlParams.get("id");
 
-function debug(msg) {
-  console.log(msg);
-  const debugDiv = document.getElementById('debugInfo');
-  if (debugDiv) {
-    debugDiv.innerHTML += `<div>🔍 ${new Date().toLocaleTimeString()}: ${msg}</div>`;
-    debugDiv.scrollTop = debugDiv.scrollHeight;
-  }
-}
-
-// Helper: floating hearts
 function createFloatingHearts() {
   for(let i = 0; i < 3; i++) {
     setTimeout(() => {
@@ -319,98 +293,78 @@ function createFloatingHearts() {
   }
 }
 
-// Display student (uses student.id for photo)
-function displayStudent(student) {
-  if (!student) {
-    debug("displayStudent: student is null/undefined");
-    return;
-  }
+function displayStudent(student, indexId = null) {
+  if (!student) return;
   
-  debug(`Displaying student: ID="${student.id}", Name="${student.name}"`);
   document.getElementById("studentName").innerText = student.name;
   
   const img = document.getElementById("studentPhoto");
-  const photoId = String(student.id).trim();
+  // Use the id from student object, or indexId (for array mode), or fallback to name
+  let photoId = student.id || indexId || idParam || String(student.name).replace(/\s/g, '');
   
-  if (photoId && photoId !== "") {
-    const photoPath = `photos/${photoId}.JPG`;
-    debug(`Attempting to load photo: ${photoPath}`);
-    img.src = photoPath;
+  if (photoId) {
+    img.src = `photos/${photoId}.JPG`;
     img.onerror = () => {
-      debug(`Failed: ${photoPath}, trying lowercase .jpg`);
       img.src = `photos/${photoId}.jpg`;
       img.onerror = () => {
-        debug(`Failed: photos/${photoId}.jpg, using placeholder`);
         img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
       };
     };
-    img.onload = () => {
-      debug(`✅ Successfully loaded: ${photoPath}`);
-    };
   } else {
-    debug(`No valid photo ID found for student`);
-    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E📷%3C/text%3E%3C/svg%3E";
+    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
   }
   
   createFloatingHearts();
 }
 
-// Load data based on mode
 function loadData() {
   if (idParam && !isSpinnerMode) {
-    debug(`Single student mode: fetching ID = ${idParam}`);
-    // Single student: call with id parameter
+    // Single student - API returns object with id
     fetch(SHEET_URL + "?id=" + encodeURIComponent(idParam))
       .then(res => res.json())
       .then(student => {
-        debug(`API response for single student: ${JSON.stringify(student)}`);
         if (student && student.name) {
           displayStudent(student);
         } else {
-          debug(`No student found for ID ${idParam}`);
           document.getElementById("studentName").innerText = "Student Not Found";
         }
       })
       .catch(err => {
-        debug(`Fetch error: ${err.message}`);
-        document.getElementById("studentName").innerText = "Error loading data";
+        console.error(err);
+        document.getElementById("studentName").innerText = "Error";
       });
   } else {
-    debug(`Loading all students (spinner mode: ${isSpinnerMode})`);
-    // Load all students (for spinner mode or random display)
+    // Load all students - for spinner or random
     fetch(SHEET_URL)
       .then(res => res.json())
       .then(data => {
-        debug(`API response type: ${Array.isArray(data) ? 'Array' : typeof data}`);
         if (Array.isArray(data) && data.length > 0) {
           allStudents = data;
-          debug(`Loaded ${allStudents.length} students. First student: ID="${allStudents[0]?.id}", Name="${allStudents[0]?.name}"`);
           
           if (isSpinnerMode) {
-            // Spinner mode: show wheel, pick random student initially
             remainingStudents = [...allStudents];
             document.getElementById('spinnerModeContainer').style.display = 'block';
             updateRemainingCount();
             const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-            displayStudent(randomStudent);
+            // For array students, use their index position as photo ID
+            const studentIndex = allStudents.indexOf(randomStudent);
+            displayStudent(randomStudent, studentIndex + 2); // +2 because row 1 is headers, row 2 is first student
           } else {
-            // No ID, no spinner: random student
             const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-            displayStudent(randomStudent);
+            const studentIndex = allStudents.indexOf(randomStudent);
+            displayStudent(randomStudent, studentIndex + 2);
           }
         } else {
-          debug("No data received or empty array");
-          document.getElementById("studentName").innerText = "No data found";
+          document.getElementById("studentName").innerText = "No Data";
         }
       })
       .catch(err => {
-        debug(`Fetch error: ${err.message}`);
-        document.getElementById("studentName").innerText = "Connection error";
+        console.error(err);
+        document.getElementById("studentName").innerText = "Connection Error";
       });
   }
 }
 
-// Spinner helpers
 function updateRemainingCount() {
   const remElem = document.getElementById('remainingCount');
   if (remainingStudents.length > 0) {
@@ -423,6 +377,7 @@ function updateRemainingCount() {
 
 function spinWheel() {
   if (isSpinning) return;
+  
   if (remainingStudents.length === 0 && allStudents.length > 0) {
     remainingStudents = [...allStudents];
     document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
@@ -430,46 +385,51 @@ function spinWheel() {
     setTimeout(() => document.getElementById("spinnerResult").innerHTML = "", 1500);
     return;
   }
+  
   if (remainingStudents.length === 0) return;
-
+  
   isSpinning = true;
   const wheel = document.getElementById('wheel');
   const spinnerResult = document.getElementById('spinnerResult');
+  
   spinnerResult.innerHTML = "🎡 Spinning... 🎡";
   const spinDegrees = 1440 + Math.random() * 720;
   wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
   wheel.style.transform = `rotate(${spinDegrees}deg)`;
-
+  
   setTimeout(() => {
     const randomIndex = Math.floor(Math.random() * remainingStudents.length);
     const selectedStudent = remainingStudents[randomIndex];
     remainingStudents.splice(randomIndex, 1);
+    
     spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
-    displayStudent(selectedStudent);
+    // Use the index to determine photo ID (row number in sheet)
+    const studentPosition = allStudents.indexOf(selectedStudent);
+    displayStudent(selectedStudent, studentPosition + 2);
+    
     updateRemainingCount();
     createFloatingHearts();
     isSpinning = false;
-    // Reset wheel
+    
     setTimeout(() => {
       wheel.style.transition = "none";
       const currentRotate = spinDegrees % 360;
       wheel.style.transform = `rotate(${currentRotate}deg)`;
       setTimeout(() => wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)", 50);
     }, 100);
+    
     setTimeout(() => {
       if (spinnerResult.innerHTML !== "🎡 Spinning... 🎡") spinnerResult.innerHTML = "";
     }, 2500);
   }, 1500);
 }
 
-// Initialize
 if (isSpinnerMode) {
   setTimeout(() => {
     const btn = document.getElementById('spinnerBtn');
     const wheelEl = document.getElementById('wheel');
     if (btn) btn.addEventListener('click', spinWheel);
     if (wheelEl) wheelEl.addEventListener('click', spinWheel);
-    debug("Spinner event listeners attached");
   }, 100);
 }
 
