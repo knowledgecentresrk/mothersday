@@ -43,6 +43,7 @@
       backdrop-filter: blur(5px);
       border: 1px solid rgba(255,255,255,0.5);
       margin: 0 auto;
+      overflow: hidden;
     }
 
     @keyframes floatCard {
@@ -63,7 +64,10 @@
       50% { text-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
     }
 
-    /* Photo & name – used both in normal view and for result reveal */
+    /* Normal content (used only for ?id=... mode) */
+    .normal-content {
+      transition: all 0.3s ease;
+    }
     .photo {
       width: 100%;
       max-width: 300px;
@@ -78,11 +82,6 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       background: #ffe0e6;
       display: block;
-    }
-
-    .photo:hover {
-      transform: scale(1.02);
-      border-color: #e91e63;
     }
 
     @keyframes photoGlow {
@@ -132,17 +131,23 @@
       50% { opacity: 1; }
     }
 
-    /* Spinner mode styles (only visible when ?mode=spinner) */
+    /* Spinner mode styles */
     .spinner-section {
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 2px dashed #ffb6c1;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+      transition: all 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
     }
 
     .wheel-container {
       position: relative;
-      display: inline-block;
-      margin: 10px auto;
       cursor: grab;
       touch-action: none;
       transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
@@ -151,8 +156,8 @@
       cursor: grabbing;
     }
     .wheel {
-      width: 220px;
-      height: 220px;
+      width: 250px;
+      height: 250px;
       border-radius: 50%;
       background: conic-gradient(
         from 0deg,
@@ -165,80 +170,114 @@
         #ffb6c1 270deg 315deg,
         #ff1493 315deg 360deg
       );
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
       transition: none;
       will-change: transform;
     }
     .pointer-icon {
       position: absolute;
-      top: -30px;
+      top: -35px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 40px;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+      font-size: 45px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
       pointer-events: none;
       z-index: 5;
     }
-    .spinner-result {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #e91e63;
-      font-weight: bold;
-      min-height: 50px;
-    }
     .remaining {
-      font-size: 12px;
-      color: #999;
-      margin-top: 5px;
+      font-size: 13px;
+      color: #e91e63;
+      background: rgba(255,255,240,0.8);
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 40px;
+      margin-top: 15px;
     }
     .reset-btn {
-      background: rgba(233,30,99,0.1);
+      background: rgba(233,30,99,0.15);
       border: 1px solid #e91e63;
       color: #e91e63;
-      padding: 6px 12px;
-      border-radius: 20px;
+      padding: 6px 14px;
+      border-radius: 40px;
       font-size: 12px;
-      margin-top: 12px;
+      margin-top: 10px;
       cursor: pointer;
       transition: 0.2s;
     }
-    .reset-btn:active { transform: scale(0.95); }
+    .reset-btn:active { transform: scale(0.96); }
+
+    /* Result reveal card – replaces the wheel */
+    .result-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,245,0.95);
+      border-radius: 35px;
+      padding: 20px;
+      opacity: 0;
+      transform: scale(0.7) rotateY(90deg);
+      transition: all 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .result-card.show {
+      opacity: 1;
+      transform: scale(1) rotateY(0deg);
+      pointer-events: auto;
+    }
+    .result-photo {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid #fff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      margin-bottom: 15px;
+      background: #ffb6c1;
+    }
+    .result-name {
+      font-size: 28px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #e91e63, #ff6b9d);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 20px;
+    }
     .spin-again-btn {
       background: linear-gradient(135deg, #e91e63, #ff6b9d);
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 10px 24px;
       font-size: 16px;
       font-weight: bold;
-      border-radius: 40px;
-      margin-top: 20px;
+      border-radius: 50px;
       cursor: pointer;
       transition: 0.2s;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     .spin-again-btn:active { transform: scale(0.96); }
 
-    /* Result card (photo+name) that appears after spin */
-    .result-card {
-      opacity: 0;
-      transform: scale(0.8);
-      transition: all 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
-      pointer-events: none;
-    }
-    .result-card.show {
-      opacity: 1;
-      transform: scale(1);
-      pointer-events: auto;
-    }
+    /* Hide wheel container */
     .hidden-wheel {
-      transform: scale(0);
       opacity: 0;
+      transform: scale(0.5);
       pointer-events: none;
+      transition: 0.4s ease;
     }
 
     @media (max-width: 480px) {
-      .wheel { width: 180px; height: 180px; }
-      .pointer-icon { font-size: 32px; top: -25px; }
+      .wheel { width: 210px; height: 210px; }
+      .pointer-icon { font-size: 38px; top: -30px; }
+      .result-photo { width: 150px; height: 150px; }
+      .result-name { font-size: 24px; }
     }
 
     .heart {
@@ -248,7 +287,6 @@
       animation: floatUp 4s ease-in forwards;
       z-index: 1000;
     }
-
     @keyframes floatUp {
       0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
       100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
@@ -260,8 +298,8 @@
 <div class="card">
   <h1>❤️ Happy Mother's Day ❤️</h1>
 
-  <!-- Normal / revealed content (initially visible only in normal mode) -->
-  <div id="normalContent">
+  <!-- Normal content (visible only in non‑spinner mode) -->
+  <div id="normalContent" class="normal-content">
     <img id="studentPhoto" class="photo" src="" alt="Student Photo">
     <div class="name" id="studentName">Loading...</div>
     <div class="message">Thank you Mom for your endless love, care and support.<br>You are the heart of our family 💖</div>
@@ -271,22 +309,21 @@
   <!-- Spinner mode container (initially hidden) -->
   <div id="spinnerModeContainer" style="display: none;">
     <div class="spinner-section">
-      <!-- Wheel area -->
-      <div style="text-align: center;">
+      <div class="wheel-wrapper" id="wheelWrapper">
         <div class="wheel-container" id="wheelContainer">
           <div class="pointer-icon">▼</div>
           <div class="wheel" id="wheel"></div>
         </div>
-        <div class="remaining" id="remainingCount"></div>
-        <div class="spinner-result" id="spinnerResult"></div>
-        <button class="reset-btn" id="resetBtn">⟳ Reset Wheel</button>
+        <!-- Result card appears here, replacing the wheel -->
+        <div class="result-card" id="resultCard">
+          <img id="resultPhoto" class="result-photo" src="" alt="">
+          <div class="result-name" id="resultName"></div>
+          <button class="spin-again-btn" id="spinAgainBtn">✨ SPIN AGAIN ✨</button>
+        </div>
       </div>
-
-      <!-- Result card (initially hidden, appears after spin) -->
-      <div id="resultCard" class="result-card" style="margin-top: 20px;">
-        <img id="resultPhoto" class="photo" src="" alt="">
-        <div class="name" id="resultName"></div>
-        <button class="spin-again-btn" id="spinAgainBtn">✨ Spin Again ✨</button>
+      <div>
+        <span class="remaining" id="remainingCount"></span>
+        <button class="reset-btn" id="resetBtn">⟳ Reset Wheel</button>
       </div>
     </div>
   </div>
@@ -308,8 +345,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const idParam = urlParams.get("id");
 
-// Helper: floating hearts
-function createFloatingHearts(count = 8) {
+// Floating hearts
+function createFloatingHearts(count = 12) {
   for(let i = 0; i < count; i++) {
     setTimeout(() => {
       const heart = document.createElement('div');
@@ -320,34 +357,35 @@ function createFloatingHearts(count = 8) {
       heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
       document.body.appendChild(heart);
       setTimeout(() => heart.remove(), 4000);
-    }, i * 80);
+    }, i * 60);
   }
 }
 
-// Display student in normal view or inside result card
-function displayStudent(student, target = 'normal') {
+// Display student in normal view
+function displayNormalStudent(student) {
   if (!student) return;
-  if (target === 'normal') {
-    document.getElementById("studentName").innerText = student.name;
-    const img = document.getElementById("studentPhoto");
-    const photoId = student.id || idParam;
-    if (photoId) {
-      img.src = `photos/${photoId}.JPG`;
-      img.onerror = () => { img.src = `photos/${photoId}.jpg`; };
-    } else {
-      img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
-    }
+  document.getElementById("studentName").innerText = student.name;
+  const img = document.getElementById("studentPhoto");
+  const photoId = student.id || idParam;
+  if (photoId) {
+    img.src = `photos/${photoId}.JPG`;
+    img.onerror = () => { img.src = `photos/${photoId}.jpg`; };
   } else {
-    // result card
-    document.getElementById("resultName").innerText = student.name;
-    const rImg = document.getElementById("resultPhoto");
-    const photoId = student.id;
-    if (photoId) {
-      rImg.src = `photos/${photoId}.JPG`;
-      rImg.onerror = () => { rImg.src = `photos/${photoId}.jpg`; };
-    } else {
-      rImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
-    }
+    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
+  }
+}
+
+// Display student in result card (spinner mode)
+function displayResultStudent(student) {
+  if (!student) return;
+  document.getElementById("resultName").innerText = student.name;
+  const rImg = document.getElementById("resultPhoto");
+  const photoId = student.id;
+  if (photoId) {
+    rImg.src = `photos/${photoId}.JPG`;
+    rImg.onerror = () => { rImg.src = `photos/${photoId}.jpg`; };
+  } else {
+    rImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
   }
 }
 
@@ -356,7 +394,7 @@ function loadData() {
     fetch(SHEET_URL + "?id=" + encodeURIComponent(idParam))
       .then(res => res.json())
       .then(student => {
-        if (student && student.name) displayStudent(student, 'normal');
+        if (student && student.name) displayNormalStudent(student);
         else document.getElementById("studentName").innerText = "Student Not Found";
       })
       .catch(() => document.getElementById("studentName").innerText = "Error");
@@ -367,18 +405,16 @@ function loadData() {
         if (Array.isArray(data) && data.length > 0) {
           allStudents = data;
           if (isSpinnerMode) {
-            // Spinner mode: hide normal content, show spinner UI
             document.getElementById('normalContent').style.display = 'none';
             document.getElementById('spinnerModeContainer').style.display = 'block';
             remainingStudents = [...allStudents];
             updateRemainingCount();
-            // Initially only wheel is visible, result card hidden
+            // Hide result card, show wheel
             document.getElementById('resultCard').classList.remove('show');
             document.getElementById('wheelContainer').classList.remove('hidden-wheel');
-            // Optionally, pick a random student as "first" but don't show it yet
           } else {
             const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-            displayStudent(randomStudent, 'normal');
+            displayNormalStudent(randomStudent);
           }
         } else {
           document.getElementById("studentName").innerText = "No Data";
@@ -393,12 +429,12 @@ function updateRemainingCount() {
   if (remainingStudents.length > 0) {
     remElem.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
   } else {
-    remElem.innerHTML = '🎉 All done! Click Reset to start over 🎉';
+    remElem.innerHTML = '🎉 All done! Reset to start over 🎉';
     remainingStudents = [...allStudents];
   }
 }
 
-// --- Physics spinner (exactly same as before) ---
+// --- Physics spinner (faster, bigger rotations) ---
 function getAngleFromEvent(e, centerX, centerY) {
   let clientX, clientY;
   if (e.touches) {
@@ -453,9 +489,11 @@ function onDragEnd(e) {
     spinRandom();
     return;
   }
-  const speed = Math.min(Math.abs(angularVelocity) * 12, 25);
+  // More speed = more rotations
+  let speed = Math.min(Math.abs(angularVelocity) * 18, 40);
   const direction = angularVelocity > 0 ? 1 : -1;
-  const extraRotations = 3 + (speed / 8);
+  // Extra rotations: between 6 and 12 full turns
+  const extraRotations = 6 + (speed / 8);
   const targetRotation = currentAngle + direction * 360 * extraRotations;
   startMomentumSpin(targetRotation, speed);
 }
@@ -464,7 +502,8 @@ function startMomentumSpin(targetRotation, speed) {
   if (spinning) return;
   spinning = true;
   const startAngle = currentAngle;
-  const duration = Math.min(800 + speed * 30, 1800);
+  // Longer duration for more dramatic spin
+  const duration = Math.min(1400 + speed * 40, 2500);
   const startTime = performance.now();
   wheel.style.transition = `transform ${duration}ms cubic-bezier(0.1, 0.9, 0.2, 1)`;
   wheel.style.transform = `rotate(${targetRotation}deg)`;
@@ -479,22 +518,18 @@ function startMomentumSpin(targetRotation, speed) {
     let adjustedAngle = (rawAngle + 90) % 360;
     const segment = 360 / total;
     let winnerIndex = Math.floor(adjustedAngle / segment) % total;
-    const winner = allStudents[winnerIndex];
+    let winner = allStudents[winnerIndex];
     if (winner) {
       const idx = remainingStudents.indexOf(winner);
       if (idx !== -1) remainingStudents.splice(idx, 1);
       updateRemainingCount();
-      // Show result card with winner
-      displayStudent(winner, 'result');
-      document.getElementById("spinnerResult").innerHTML = `✨ ${winner.name}! ✨`;
-      createFloatingHearts(12);
-      if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+      // Show result with beautiful transition
+      displayResultStudent(winner);
+      createFloatingHearts(20);
+      if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(100);
       // Hide wheel, show result card
       document.getElementById('wheelContainer').classList.add('hidden-wheel');
       document.getElementById('resultCard').classList.add('show');
-      setTimeout(() => {
-        document.getElementById("spinnerResult").innerHTML = "";
-      }, 2500);
     } else {
       spinRandom(); // fallback
     }
@@ -506,8 +541,6 @@ function spinRandom() {
   if (remainingStudents.length === 0 && allStudents.length > 0) {
     remainingStudents = [...allStudents];
     updateRemainingCount();
-    document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
-    setTimeout(() => document.getElementById("spinnerResult").innerHTML = "", 1500);
   }
   if (remainingStudents.length === 0) return;
   const randomIndex = Math.floor(Math.random() * remainingStudents.length);
@@ -523,8 +556,10 @@ function spinRandom() {
   let currentRot = currentAngle % 360;
   let delta = targetAngle - currentRot;
   if (delta < 0) delta += 360;
-  const finalAngle = currentAngle + delta + 360 * 4;
-  startMomentumSpin(finalAngle, 15);
+  // Add many extra spins: 6 to 10 full rotations
+  const extraSpins = 6 + Math.floor(Math.random() * 5);
+  const finalAngle = currentAngle + delta + 360 * extraSpins;
+  startMomentumSpin(finalAngle, 25);
 }
 
 function resetWheel() {
@@ -538,19 +573,17 @@ function resetWheel() {
   }, 500);
   remainingStudents = [...allStudents];
   updateRemainingCount();
-  document.getElementById("spinnerResult").innerHTML = "⟳ Reset! Spin again!";
-  setTimeout(() => document.getElementById("spinnerResult").innerHTML = "", 1500);
-  // Also reset UI: show wheel, hide result card
+  // Reset UI: hide result, show wheel
   document.getElementById('wheelContainer').classList.remove('hidden-wheel');
   document.getElementById('resultCard').classList.remove('show');
 }
 
-// --- Spin Again: hide result, show wheel, allow new spin ---
 function spinAgain() {
   if (spinning) return;
+  // Hide result, show wheel
   document.getElementById('resultCard').classList.remove('show');
   document.getElementById('wheelContainer').classList.remove('hidden-wheel');
-  // Optionally reset wheel angle to a fresh position
+  // Optionally reset wheel angle
   currentAngle = 0;
   wheel.style.transition = 'transform 0.3s ease';
   wheel.style.transform = 'rotate(0deg)';
@@ -558,7 +591,6 @@ function spinAgain() {
     wheel.style.transition = '';
     currentAngle = 0;
   }, 300);
-  document.getElementById("spinnerResult").innerHTML = "";
 }
 
 // --- Initialization for spinner mode ---
