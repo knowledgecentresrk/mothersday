@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
   <title>Happy Mother's Day</title>
 
   <style>
@@ -19,8 +19,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
-      animation: bgPulse 3s ease-in-out infinite;
+      padding: 15px;
+      margin: 0;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     @keyframes bgPulse {
@@ -30,28 +32,31 @@
 
     .card {
       background: rgba(255, 255, 255, 0.95);
-      width: 90%;
-      max-width: 550px;
+      width: 100%;
+      max-width: 500px;
       border-radius: 35px;
-      padding: 30px;
+      padding: 25px 20px;
       text-align: center;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
       animation: floatCard 3s ease-in-out infinite;
       backdrop-filter: blur(5px);
       border: 1px solid rgba(255,255,255,0.5);
+      margin: 0 auto;
+      overflow-x: hidden;
     }
 
     @keyframes floatCard {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
+      50% { transform: translateY(-5px); }
     }
 
     h1 {
       color: #e91e63;
       margin-bottom: 15px;
-      font-size: 2em;
+      font-size: 1.8em;
       animation: titleGlow 2s ease-in-out infinite;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
+      word-break: keep-all;
     }
 
     @keyframes titleGlow {
@@ -60,16 +65,19 @@
     }
 
     .photo {
-      width: 320px;
-      height: 320px;
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      aspect-ratio: 1 / 1;
       border-radius: 25px;
       object-fit: cover;
-      border: 8px solid #ffb6c1;
-      margin-top: 15px;
+      border: 6px solid #ffb6c1;
+      margin: 15px auto 0;
       transition: all 0.5s ease;
       animation: photoGlow 2s ease-in-out infinite;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       background: #ffe0e6;
+      display: block;
     }
 
     .photo:hover {
@@ -83,7 +91,7 @@
     }
 
     .name {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: bold;
       margin-top: 20px;
       background: linear-gradient(135deg, #e91e63, #ff6b9d);
@@ -91,24 +99,27 @@
       background-clip: text;
       color: transparent;
       animation: nameWave 1.5s ease-in-out infinite;
+      word-break: break-word;
+      padding: 0 10px;
     }
 
     @keyframes nameWave {
       0%, 100% { letter-spacing: normal; }
-      50% { letter-spacing: 3px; }
+      50% { letter-spacing: 2px; }
     }
 
     .message {
-      font-size: 18px;
+      font-size: 16px;
       margin-top: 15px;
       color: #555;
-      line-height: 1.6;
+      line-height: 1.5;
       animation: fadeInOut 3s ease-in-out infinite;
+      padding: 0 10px;
     }
 
     @keyframes fadeInOut {
       0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.02); }
+      50% { opacity: 1; transform: scale(1.01); }
     }
 
     .footer {
@@ -133,8 +144,8 @@
       background: linear-gradient(135deg, #e91e63, #ff6b9d);
       color: white;
       border: none;
-      padding: 14px 28px;
-      font-size: 18px;
+      padding: 12px 24px;
+      font-size: 16px;
       font-weight: bold;
       border-radius: 50px;
       cursor: pointer;
@@ -143,6 +154,8 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
+      width: auto;
+      max-width: 100%;
     }
 
     .spinner-btn:hover {
@@ -161,11 +174,12 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      width: 100%;
     }
 
     .wheel {
-      width: 200px;
-      height: 200px;
+      width: 180px;
+      height: 180px;
       border-radius: 50%;
       background: conic-gradient(
         from 0deg,
@@ -183,6 +197,7 @@
       cursor: pointer;
       position: relative;
       animation: wheelPulse 2s ease-in-out infinite;
+      margin: 0 auto;
     }
 
     @keyframes wheelPulse {
@@ -196,7 +211,7 @@
       top: -30px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 30px;
+      font-size: 28px;
       filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
     }
 
@@ -206,7 +221,7 @@
       top: -15px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 25px;
+      font-size: 22px;
       color: #e91e63;
       filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
     }
@@ -217,6 +232,8 @@
       color: #e91e63;
       font-weight: bold;
       min-height: 40px;
+      word-break: break-word;
+      padding: 0 10px;
     }
 
     .remaining {
@@ -241,6 +258,44 @@
       100% {
         transform: translateY(-20vh) rotate(360deg);
         opacity: 0;
+      }
+    }
+
+    /* Mobile fixes */
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px 15px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      .photo {
+        max-width: 260px;
+      }
+      
+      .name {
+        font-size: 24px;
+      }
+      
+      .message {
+        font-size: 14px;
+      }
+      
+      .wheel {
+        width: 150px;
+        height: 150px;
+      }
+      
+      .wheel::before {
+        font-size: 24px;
+        top: -25px;
+      }
+      
+      .wheel::after {
+        font-size: 18px;
+        top: -12px;
       }
     }
   </style>
@@ -289,7 +344,7 @@ const isSpinnerMode = urlParams.get("mode") === "spinner";
 const id = urlParams.get("id");
 
 function createFloatingHearts() {
-  for(let i = 0; i < 5; i++) {
+  for(let i = 0; i < 3; i++) {
     setTimeout(() => {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -308,17 +363,14 @@ function displayStudent(student) {
   
   document.getElementById("studentName").innerText = student.name;
   
-  // IMPORTANT: Use student.admissionNumber or student.id based on your Apps Script output
   const studentId = student.admissionNumber || student.id;
   
   if (studentId) {
     const img = document.getElementById("studentPhoto");
     img.src = `photos/${studentId}.JPG`;
     img.onerror = function() {
-      this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
+      this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
     };
-  } else {
-    console.warn("No ID found for student:", student);
   }
   
   createFloatingHearts();
@@ -333,18 +385,15 @@ function loadStudentData() {
   fetch(url)
     .then(res => res.json())
     .then(data => {
-      console.log("Data from API:", data);
+      console.log("Data:", data);
       
-      // Handle single student (when ID provided)
       if (data && data.name && !Array.isArray(data)) {
-        // Add the ID from URL if not present
         if (!data.id && !data.admissionNumber && id) {
           data.admissionNumber = id;
         }
         allStudents = [data];
         displayStudent(data);
       }
-      // Handle array of students
       else if (Array.isArray(data) && data.length > 0) {
         allStudents = data;
         
@@ -442,8 +491,10 @@ function spinWheel() {
 
 if (isSpinnerMode) {
   setTimeout(() => {
-    document.getElementById('spinnerBtn').addEventListener('click', spinWheel);
-    document.getElementById('wheel').addEventListener('click', spinWheel);
+    const btn = document.getElementById('spinnerBtn');
+    const wheelEl = document.getElementById('wheel');
+    if (btn) btn.addEventListener('click', spinWheel);
+    if (wheelEl) wheelEl.addEventListener('click', spinWheel);
   }, 100);
 }
 
@@ -451,7 +502,7 @@ loadStudentData();
 
 setInterval(() => {
   if (Math.random() > 0.7) createFloatingHearts();
-}, 3000);
+}, 4000);
 </script>
 
 </body>
