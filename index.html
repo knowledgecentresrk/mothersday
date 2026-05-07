@@ -306,7 +306,7 @@ let isSpinning = false;
 
 const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
-const id = urlParams.get("id");
+const idParam = urlParams.get("id");
 
 function createFloatingHearts() {
   for(let i = 0; i < 3; i++) {
@@ -323,70 +323,74 @@ function createFloatingHearts() {
   }
 }
 
-function displayStudent(student, studentIdFromUrl = null) {
+function displayStudent(student, customPhotoId = null) {
   if (!student) return;
   
+  // Display the name
   document.getElementById("studentName").innerText = student.name;
   
-  // Get the ID - either from the student object or from URL parameter
-  let studentId = student.id || student.admissionNumber;
+  // Get photo ID - either custom ID or from student object or use name as fallback
+  let photoId = customPhotoId;
+  if (!photoId && student.id) photoId = student.id;
+  if (!photoId) photoId = student.name.replace(/\s/g, '');
   
-  // If no ID in student object but we have URL parameter, use that
-  if (!studentId && studentIdFromUrl) {
-    studentId = studentIdFromUrl;
-  }
-  
-  if (studentId) {
-    const img = document.getElementById("studentPhoto");
-    img.src = `photos/${studentId}.JPG`;
-    img.onerror = function() {
+  // Load photo
+  const img = document.getElementById("studentPhoto");
+  img.src = `photos/${photoId}.JPG`;
+  img.onerror = function() {
+    // If .JPG fails, try lowercase
+    this.src = `photos/${photoId}.jpg`;
+    this.onerror = function() {
+      // Fallback to heart placeholder
       this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
     };
-  }
+  };
   
   createFloatingHearts();
 }
 
 function loadStudentData() {
-  let url = SHEET_URL;
-  
-  fetch(url)
+  fetch(SHEET_URL)
     .then(res => res.json())
     .then(data => {
       console.log("Data from API:", data);
       
-      // Handle array of students (spinner mode or no ID)
+      // Handle array of students
       if (Array.isArray(data) && data.length > 0) {
         allStudents = data;
         
         if (isSpinnerMode) {
-          // Spinner mode - show the wheel
+          // Spinner mode - show wheel and random student
           remainingStudents = [...allStudents];
           document.getElementById('spinnerModeContainer').style.display = 'block';
           updateRemainingCount();
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
           displayStudent(randomStudent);
         } 
-        else if (id) {
-          // Normal mode with ID - find student by matching name or index
-          // Since API doesn't return IDs in array, we use the URL ID to get the photo
-          const student = allStudents.find(s => String(s.name).toLowerCase() === String(id)) || allStudents[0];
-          if (student) {
-            displayStudent(student, id);
+        else if (idParam) {
+          // Student view with ID parameter
+          // Since API doesn't return IDs, we find student by index position
+          // The ID param corresponds to the row number (1-based index)
+          const studentIndex = parseInt(idParam) - 1; // Convert to 0-based index
+          
+          if (studentIndex >= 0 && studentIndex < allStudents.length) {
+            const student = allStudents[studentIndex];
+            displayStudent(student, idParam); // Pass ID param for photo
           } else {
             document.getElementById("studentName").innerText = "Student Not Found";
+            document.getElementById("studentPhoto").src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❌%3C/text%3E%3C/svg%3E";
           }
         } 
         else {
-          // No ID, no spinner - show random
+          // No ID, no spinner - show random student
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
           displayStudent(randomStudent);
         }
       }
-      // Handle single student object (when API returns object)
+      // Handle single student object
       else if (data && data.name) {
         allStudents = [data];
-        displayStudent(data, id);
+        displayStudent(data, idParam);
       }
       else {
         document.getElementById("studentName").innerText = "No Data Found";
@@ -394,7 +398,7 @@ function loadStudentData() {
     })
     .catch(err => {
       console.error("Fetch error:", err);
-      document.getElementById("studentName").innerText = "Welcome!";
+      document.getElementById("studentName").innerText = "Connection Error";
     });
 }
 
