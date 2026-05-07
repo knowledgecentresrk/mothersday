@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mother's Day Lucky Spinner</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+    min-height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    color:white;
+}
+
+h1{
+    margin-bottom:20px;
+    font-size:45px;
+    text-shadow:0 3px 10px rgba(0,0,0,0.3);
+}
+
+#wheelContainer{
+    position:relative;
+    width:320px;
+    height:320px;
+}
+
+#wheel{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    border:10px solid white;
+    background:
+    conic-gradient(
+        #ff4d6d 0deg 45deg,
+        #ff758f 45deg 90deg,
+        #ff8fa3 90deg 135deg,
+        #ffb3c1 135deg 180deg,
+        #ffc2d1 180deg 225deg,
+        #ffe5ec 225deg 270deg,
+        #ff8fab 270deg 315deg,
+        #fb6f92 315deg 360deg
+    );
+
+    transition:transform 5s cubic-bezier(0.17,0.67,0.12,0.99);
+}
+
+.pointer{
+    position:absolute;
+    top:-25px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:20px solid transparent;
+    border-right:20px solid transparent;
+    border-bottom:40px solid white;
+}
+
+button{
+    margin-top:30px;
+    padding:15px 40px;
+    font-size:22px;
+    border:none;
+    border-radius:50px;
+    cursor:pointer;
+    background:white;
+    color:#ff4d6d;
+    font-weight:bold;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+#result{
+    margin-top:35px;
+    display:none;
+    animation:fadeIn 1s ease;
+}
+
+#result img{
+    width:220px;
+    height:220px;
+    object-fit:cover;
+    border-radius:25px;
+    border:8px solid white;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+#studentName{
+    margin-top:20px;
+    font-size:35px;
+    font-weight:bold;
+    text-shadow:0 3px 10px rgba(0,0,0,0.3);
+}
+
+.message{
+    margin-top:10px;
+    font-size:22px;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:scale(0.7);
+    }
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.heart{
+    position:absolute;
+    bottom:-50px;
+    animation:floatUp linear infinite;
+}
+
+@keyframes floatUp{
+    0%{
+        transform:translateY(0);
+        opacity:0;
+    }
+
+    20%{
+        opacity:1;
+    }
+
+    100%{
+        transform:translateY(-120vh);
+        opacity:0;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>❤️ Mother's Day Lucky Spinner ❤️</h1>
+
+<div id="wheelContainer">
+
+    <div class="pointer"></div>
+
+    <div id="wheel"></div>
+
+</div>
+
+<button onclick="spinWheel()">
+SPIN
+</button>
+
+<div id="result">
+
+    <img id="photo" src="">
+
+    <div id="studentName"></div>
+
+    <div class="message">
+        🌸 Happy Mother's Day 🌸
+    </div>
+
+</div>
+
+<script>
+
+/* ADD STUDENTS HERE */
+
+const students = [
+
+{ id:"1234", name:"Aarav" },
+
+{ id:"5678", name:"Mehak" },
+
+{ id:"9012", name:"Riya" },
+
+{ id:"3456", name:"Kabir" }
+
+];
+
+/* NON-REPEATING SYSTEM */
+
+let remaining = [...students];
+
+const wheel = document.getElementById("wheel");
+
+function spinWheel(){
+
+    if(remaining.length === 0){
+
+        alert("All students completed!");
+
+        remaining = [...students];
+    }
+
+    const randomIndex =
+    Math.floor(Math.random() * remaining.length);
+
+    const student =
+    remaining[randomIndex];
+
+    remaining.splice(randomIndex,1);
+
+    const rotation =
+    3600 + Math.floor(Math.random()*360);
+
+    wheel.style.transform =
+    `rotate(${rotation}deg)`;
+
+    setTimeout(()=>{
+
+        document.getElementById("result").style.display =
+        "block";
+
+        document.getElementById("photo").src =
+        "photos/" + student.id + ".JPG";
+
+        document.getElementById("studentName").innerText =
+        student.name;
+
+    },5000);
+}
+
+/* HEARTS */
+
+function createHeart(){
+
+    const heart = document.createElement("div");
+
+    heart.classList.add("heart");
+
+    heart.innerHTML = "❤️";
+
+    heart.style.left =
+    Math.random() * 100 + "vw";
+
+    heart.style.fontSize =
+    (20 + Math.random()*30) + "px";
+
+    heart.style.animationDuration =
+    (5 + Math.random()*5) + "s";
+
+    document.body.appendChild(heart);
+
+    setTimeout(()=>{
+        heart.remove();
+    },10000);
+}
+
+setInterval(createHeart,300);
+
+</script>
+
+</body>
+</html>
