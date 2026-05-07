@@ -6,66 +6,268 @@
   <title>Happy Mother's Day</title>
 
   <style>
-    body{
-      margin:0;
-      padding:0;
-      font-family:Arial, sans-serif;
-      background: linear-gradient(135deg,#ffdde1,#ee9ca7);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .card{
-      background:white;
-      width:90%;
-      max-width:450px;
-      border-radius:25px;
-      padding:25px;
-      text-align:center;
-      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: bgPulse 3s ease-in-out infinite;
     }
 
-    h1{
-      color:#e91e63;
-      margin-bottom:10px;
+    @keyframes bgPulse {
+      0%, 100% { background: linear-gradient(135deg, #ffdde1, #ee9ca7); }
+      50% { background: linear-gradient(135deg, #ffe0e6, #ffb0bd); }
     }
 
-    .photo{
-      width:220px;
-      height:220px;
-      border-radius:20px;
-      object-fit:cover;
-      border:6px solid #ffb6c1;
-      margin-top:15px;
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      width: 90%;
+      max-width: 550px;
+      border-radius: 35px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      animation: floatCard 3s ease-in-out infinite;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.5);
     }
 
-    .name{
-      font-size:28px;
-      font-weight:bold;
-      margin-top:20px;
-      color:#333;
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
     }
 
-    .message{
-      font-size:18px;
-      margin-top:15px;
-      color:#555;
-      line-height:1.6;
+    h1 {
+      color: #e91e63;
+      margin-bottom: 15px;
+      font-size: 2em;
+      animation: titleGlow 2s ease-in-out infinite;
+      letter-spacing: 2px;
     }
 
-    .footer{
-      margin-top:20px;
-      color:#999;
-      font-size:14px;
+    @keyframes titleGlow {
+      0%, 100% { text-shadow: 0 0 5px #ffb6c1, 0 0 10px #ffb6c1; }
+      50% { text-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
+    }
+
+    .photo {
+      width: 320px;
+      height: 320px;
+      border-radius: 25px;
+      object-fit: cover;
+      border: 8px solid #ffb6c1;
+      margin-top: 15px;
+      transition: all 0.5s ease;
+      animation: photoGlow 2s ease-in-out infinite;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .photo:hover {
+      transform: scale(1.02);
+      border-color: #e91e63;
+    }
+
+    @keyframes photoGlow {
+      0%, 100% { box-shadow: 0 0 5px #ffb6c1, 0 0 10px #ffb6c1; }
+      50% { box-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
+    }
+
+    .name {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 20px;
+      background: linear-gradient(135deg, #e91e63, #ff6b9d);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: nameWave 1.5s ease-in-out infinite;
+    }
+
+    @keyframes nameWave {
+      0%, 100% { letter-spacing: normal; }
+      50% { letter-spacing: 3px; }
+    }
+
+    .message {
+      font-size: 18px;
+      margin-top: 15px;
+      color: #555;
+      line-height: 1.6;
+      animation: fadeInOut 3s ease-in-out infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: #999;
+      font-size: 14px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Spinner Button Styles - Only visible on spinner page */
+    .spinner-section {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 2px dashed #ffb6c1;
+    }
+
+    .spinner-btn {
+      background: linear-gradient(135deg, #e91e63, #ff6b9d);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(233,30,99,0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .spinner-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(233,30,99,0.6);
+    }
+
+    .spinner-btn:active {
+      transform: scale(0.95);
+    }
+
+    .spinner-container {
+      margin-top: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .wheel {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #e91e63 0deg 45deg,
+        #ff6b9d 45deg 90deg,
+        #ffb6c1 90deg 135deg,
+        #ff1493 135deg 180deg,
+        #e91e63 180deg 225deg,
+        #ff6b9d 225deg 270deg,
+        #ffb6c1 270deg 315deg,
+        #ff1493 315deg 360deg
+      );
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+      cursor: pointer;
+      position: relative;
+      animation: wheelPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes wheelPulse {
+      0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+      50% { box-shadow: 0 15px 40px rgba(233,30,99,0.5); }
+    }
+
+    .wheel::before {
+      content: "🎡";
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 30px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+    }
+
+    .wheel::after {
+      content: "▼";
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 25px;
+      color: #e91e63;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+    }
+
+    .spinner-result {
+      margin-top: 15px;
+      font-size: 16px;
+      color: #e91e63;
+      font-weight: bold;
+      min-height: 40px;
+    }
+
+    .remaining {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+    }
+
+    /* Heart floating animation */
+    .heart {
+      position: fixed;
+      font-size: 20px;
+      pointer-events: none;
+      animation: floatUp 4s ease-in forwards;
+      z-index: 1000;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-20vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Spinner link button */
+    .spinner-link-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff9800, #ff5722);
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: bold;
+      margin-top: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(255,87,34,0.4);
+    }
+
+    .spinner-link-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(255,87,34,0.6);
     }
   </style>
 </head>
 <body>
 
 <div class="card">
-
   <h1>❤️ Happy Mother's Day ❤️</h1>
 
   <img id="studentPhoto" class="photo" src="" alt="Student Photo">
@@ -81,30 +283,210 @@
     With Love
   </div>
 
+  <!-- Spinner Mode Container (initially hidden) -->
+  <div id="spinnerModeContainer" style="display: none;">
+    <div class="spinner-section">
+      <button class="spinner-btn" id="spinnerBtn">
+        🎰 Spin the Wheel 🎰
+      </button>
+      <div class="spinner-container" id="spinnerContainer">
+        <div class="wheel" id="wheel"></div>
+        <div class="spinner-result" id="spinnerResult"></div>
+        <div class="remaining" id="remainingCount"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTAI9jNz5_f1zmHltGgYztCN2fkrQpvaXjuJslX2vOHquKoLi2zLfVF0v-NPvQZQ56/exec";
 
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+// Store all students data
+let allStudents = [];
+let remainingStudents = [];
+let isSpinning = false;
 
-fetch(SHEET_URL + "?id=" + id)
-.then(res => res.json())
-.then(data => {
+// Check if we're in spinner mode
+const urlParams = new URLSearchParams(window.location.search);
+const isSpinnerMode = urlParams.get("mode") === "spinner";
 
-  document.getElementById("studentName").innerText = data.name;
+// Get ID parameter (only for normal mode)
+const id = urlParams.get("id");
 
-  document.getElementById("studentPhoto").src =
-    "photos/" + id + ".JPG";
+// Function to create floating hearts
+function createFloatingHearts() {
+  for(let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerHTML = ['❤️', '💖', '💗', '💓', '💕'][Math.floor(Math.random() * 5)];
+      heart.style.left = Math.random() * 100 + '%';
+      heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+      heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 4000);
+    }, i * 200);
+  }
+}
 
-})
-.catch(err => {
-  document.getElementById("studentName").innerText =
-    "Student Not Found";
-});
+// Function to display student
+function displayStudent(student) {
+  if (!student) return;
+  
+  document.getElementById("studentName").innerText = student.name;
+  
+  // Try multiple photo formats
+  const img = document.getElementById("studentPhoto");
+  img.src = `photos/${student.id}.jpg`;
+  img.onerror = () => {
+    img.src = `photos/${student.id}.png`;
+    img.onerror = () => {
+      img.src = `photos/${student.id}.jpeg`;
+      img.onerror = () => {
+        img.src = `https://via.placeholder.com/320x320?text=${encodeURIComponent(student.name || '❤️')}`;
+      };
+    };
+  };
+  
+  createFloatingHearts();
+}
 
+// Load student data
+function loadStudentData() {
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(data => {
+      if (Array.isArray(data)) {
+        allStudents = data;
+        
+        if (isSpinnerMode) {
+          // Spinner mode: show spinner UI
+          remainingStudents = [...allStudents];
+          document.getElementById('spinnerModeContainer').style.display = 'block';
+          updateRemainingCount();
+          
+          // Show random student initially
+          const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
+          displayStudent(randomStudent);
+        } else if (id) {
+          // Normal mode with specific ID
+          const student = allStudents.find(s => s.id == id);
+          if (student) {
+            displayStudent(student);
+          } else {
+            document.getElementById("studentName").innerText = "Student Not Found";
+          }
+        } else {
+          // Normal mode without ID - show random
+          const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
+          displayStudent(randomStudent);
+        }
+      } else if (data.name) {
+        allStudents = [data];
+        displayStudent(data);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("studentName").innerText = "Welcome!";
+      document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=✨+Happy+Mother's+Day";
+    });
+}
+
+// Spinner functions
+function updateRemainingCount() {
+  const remainingCount = document.getElementById('remainingCount');
+  if (remainingStudents.length > 0) {
+    remainingCount.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
+  } else {
+    remainingCount.innerHTML = '🎉 All done! Resetting... 🎉';
+    remainingStudents = [...allStudents];
+  }
+}
+
+function spinWheel() {
+  if (isSpinning) return;
+  if (remainingStudents.length === 0) {
+    remainingStudents = [...allStudents];
+    document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
+    updateRemainingCount();
+    setTimeout(() => {
+      document.getElementById("spinnerResult").innerHTML = "";
+    }, 1500);
+    return;
+  }
+  
+  isSpinning = true;
+  const wheel = document.getElementById('wheel');
+  const spinnerResult = document.getElementById('spinnerResult');
+  
+  spinnerResult.innerHTML = "🎡 Spinning... 🎡";
+  
+  // Random spin animation
+  const spinDegrees = 1440 + Math.random() * 720;
+  wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
+  wheel.style.transform = `rotate(${spinDegrees}deg)`;
+  
+  setTimeout(() => {
+    // Pick random student from remaining
+    const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+    const selectedStudent = remainingStudents[randomIndex];
+    
+    // Remove from remaining
+    remainingStudents.splice(randomIndex, 1);
+    
+    // Display the result
+    spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
+    displayStudent(selectedStudent);
+    updateRemainingCount();
+    
+    createFloatingHearts();
+    isSpinning = false;
+    
+    // Reset wheel rotation
+    setTimeout(() => {
+      wheel.style.transition = "none";
+      const currentRotate = spinDegrees % 360;
+      wheel.style.transform = `rotate(${currentRotate}deg)`;
+      setTimeout(() => {
+        wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)";
+      }, 50);
+    }, 100);
+    
+    // Clear result after 2 seconds
+    setTimeout(() => {
+      if (spinnerResult.innerHTML !== "🎡 Spinning... 🎡") {
+        spinnerResult.innerHTML = "";
+      }
+    }, 2500);
+    
+  }, 1500);
+}
+
+// Setup spinner event listener if in spinner mode
+if (isSpinnerMode) {
+  setTimeout(() => {
+    const spinnerBtn = document.getElementById('spinnerBtn');
+    const wheel = document.getElementById('wheel');
+    
+    if (spinnerBtn) {
+      spinnerBtn.addEventListener('click', spinWheel);
+    }
+    if (wheel) {
+      wheel.addEventListener('click', spinWheel);
+    }
+  }, 100);
+}
+
+// Initialize
+loadStudentData();
+
+// Continuous floating hearts
+setInterval(() => {
+  if (Math.random() > 0.7) {
+    createFloatingHearts();
+  }
+}, 3000);
 </script>
 
 </body>
