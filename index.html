@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
-  <title>Happy Mother's Day</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Happy Mother's Day - Spin the Wheel</title>
 
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -24,6 +26,7 @@
       width: 100%;
       overflow-x: hidden;
       animation: bgPulse 3s ease-in-out infinite;
+      touch-action: pan-y pinch-zoom;
     }
 
     @keyframes bgPulse {
@@ -65,7 +68,7 @@
 
     .photo {
       width: 100%;
-      max-width: 300px;
+      max-width: 280px;
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 25px;
@@ -77,6 +80,17 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       background: #ffe0e6;
       display: block;
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    .photo.show {
+      animation: photoReveal 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    @keyframes photoReveal {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     .photo:hover {
@@ -97,13 +111,17 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: nameWave 1.5s ease-in-out infinite;
-      word-break: break-word;
+      opacity: 0;
+      transform: translateY(20px);
     }
 
-    @keyframes nameWave {
-      0%, 100% { letter-spacing: normal; }
-      50% { letter-spacing: 2px; }
+    .name.show {
+      animation: nameReveal 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    @keyframes nameReveal {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
     .message {
@@ -111,24 +129,12 @@
       margin-top: 15px;
       color: #555;
       line-height: 1.5;
-      animation: fadeInOut 3s ease-in-out infinite;
-    }
-
-    @keyframes fadeInOut {
-      0%, 100% { opacity: 0.8; }
-      50% { opacity: 1; }
     }
 
     .footer {
       margin-top: 20px;
       color: #999;
       font-size: 14px;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
     }
 
     .spinner-section {
@@ -137,38 +143,28 @@
       border-top: 2px dashed #ffb6c1;
     }
 
-    .spinner-btn {
-      background: linear-gradient(135deg, #e91e63, #ff6b9d);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(233,30,99,0.4);
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .spinner-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 25px rgba(233,30,99,0.6);
-    }
-
     .spinner-container {
       margin-top: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 100%;
+      position: relative;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .wheel-wrapper:active {
+      cursor: grabbing;
     }
 
     .wheel {
-      width: 180px;
-      height: 180px;
+      width: 260px;
+      height: 260px;
       border-radius: 50%;
       background: conic-gradient(
         from 0deg,
@@ -182,11 +178,15 @@
         #ff1493 315deg 360deg
       );
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+      transition: none;
       cursor: pointer;
       position: relative;
-      animation: wheelPulse 2s ease-in-out infinite;
       margin: 0 auto;
+      will-change: transform;
+    }
+
+    .wheel.spinning {
+      transition: transform cubic-bezier(0.1, 0.9, 0.2, 1);
     }
 
     @keyframes wheelPulse {
@@ -194,32 +194,64 @@
       50% { box-shadow: 0 15px 40px rgba(233,30,99,0.5); }
     }
 
-    .wheel::before {
-      content: "🎡";
+    .pointer {
       position: absolute;
-      top: -30px;
+      top: -20px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 28px;
+      font-size: 35px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+      z-index: 10;
+      pointer-events: none;
     }
 
-    .wheel::after {
-      content: "▼";
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 22px;
-      color: #e91e63;
-    }
-
-    .spinner-result, .remaining {
-      margin-top: 15px;
-      font-size: 16px;
+    .spinner-result {
+      margin-top: 20px;
+      font-size: 18px;
       color: #e91e63;
       font-weight: bold;
+      min-height: 50px;
+      opacity: 0;
+      transform: scale(0.8);
     }
-    .remaining { font-size: 12px; color: #999; margin-top: 5px; }
+
+    .spinner-result.show {
+      animation: resultPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    @keyframes resultPop {
+      0% { opacity: 0; transform: scale(0.5); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .remaining {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+    }
+
+    .spin-instruction {
+      font-size: 12px;
+      color: #e91e63;
+      margin-top: 10px;
+      opacity: 0.7;
+    }
+
+    .reset-btn {
+      background: rgba(233,30,99,0.1);
+      border: 1px solid #e91e63;
+      color: #e91e63;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .reset-btn:active {
+      transform: scale(0.95);
+    }
 
     .heart {
       position: fixed;
@@ -237,12 +269,11 @@
     @media (max-width: 480px) {
       .card { padding: 20px 15px; }
       h1 { font-size: 1.5em; }
-      .photo { max-width: 260px; }
+      .photo { max-width: 220px; }
       .name { font-size: 24px; }
       .message { font-size: 14px; }
-      .wheel { width: 150px; height: 150px; }
-      .wheel::before { font-size: 24px; top: -25px; }
-      .wheel::after { font-size: 18px; top: -12px; }
+      .wheel { width: 220px; height: 220px; }
+      .pointer { font-size: 28px; top: -18px; }
     }
   </style>
 </head>
@@ -257,29 +288,51 @@
 
   <div id="spinnerModeContainer" style="display: none;">
     <div class="spinner-section">
-      <button class="spinner-btn" id="spinnerBtn">🎰 Spin the Wheel 🎰</button>
       <div class="spinner-container">
-        <div class="wheel" id="wheel"></div>
+        <div style="position: relative; display: inline-block;">
+          <div class="pointer">▼</div>
+          <div class="wheel-wrapper">
+            <div class="wheel" id="wheel"></div>
+          </div>
+        </div>
         <div class="spinner-result" id="spinnerResult"></div>
         <div class="remaining" id="remainingCount"></div>
+        <div class="spin-instruction">👆 Flick or drag the wheel to spin!</div>
+        <button class="reset-btn" id="resetBtn">⟳ Reset Wheel</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbx8ViWEIG02LBFrg9PsXqgxblNn-y9mThHSz4byR0u6IoQ-yoaqLHsX4qdywoM7aV1h/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTAI9jNz5_f1zmHltGgYztCN2fkrQpvaXjuJslX2vOHquKoLi2zLfVF0v-NPvQZQ56/exec";
 
 let allStudents = [];
 let remainingStudents = [];
-let isSpinning = false;
+let currentStudent = null;
+
+let wheelAngle = 0;
+let spinning = false;
+let spinAnimation = null;
+let spinStartTime = 0;
+let spinStartAngle = 0;
+let spinVelocity = 0;
+let lastTimestamp = 0;
+let lastAngle = 0;
+
+let touchStartX = 0, touchStartY = 0;
+let touchStartAngle = 0;
+let isDragging = false;
 
 const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const idParam = urlParams.get("id");
 
-function createFloatingHearts() {
-  for(let i = 0; i < 3; i++) {
+const wheelElement = document.getElementById('wheel');
+const wheelWrapper = document.querySelector('.wheel-wrapper');
+
+function createFloatingHearts(count = 8) {
+  for(let i = 0; i < count; i++) {
     setTimeout(() => {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -289,80 +342,319 @@ function createFloatingHearts() {
       heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
       document.body.appendChild(heart);
       setTimeout(() => heart.remove(), 4000);
-    }, i * 200);
+    }, i * 100);
   }
 }
 
-function displayStudent(student, indexId = null) {
+function playHaptic() {
+  if (window.navigator && window.navigator.vibrate) {
+    window.navigator.vibrate(50);
+  }
+}
+
+function displayStudent(student) {
   if (!student) return;
   
-  document.getElementById("studentName").innerText = student.name;
+  currentStudent = student;
   
-  const img = document.getElementById("studentPhoto");
-  // Use the id from student object, or indexId (for array mode), or fallback to name
-  let photoId = student.id || indexId || idParam || String(student.name).replace(/\s/g, '');
+  const nameElement = document.getElementById('studentName');
+  const photoElement = document.getElementById('studentPhoto');
   
-  if (photoId) {
-    img.src = `photos/${photoId}.JPG`;
-    img.onerror = () => {
-      img.src = `photos/${photoId}.jpg`;
-      img.onerror = () => {
-        img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
+  nameElement.classList.remove('show');
+  photoElement.classList.remove('show');
+  
+  setTimeout(() => {
+    nameElement.innerText = student.name;
+    nameElement.classList.add('show');
+    
+    const photoId = student.id || idParam;
+    if (photoId) {
+      photoElement.src = `photos/${photoId}.JPG`;
+      photoElement.onerror = () => {
+        photoElement.src = `photos/${photoId}.jpg`;
+        photoElement.onerror = () => {
+          photoElement.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
+        };
       };
-    };
-  } else {
-    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
-  }
-  
-  createFloatingHearts();
+    }
+    photoElement.classList.add('show');
+  }, 50);
 }
 
-function loadData() {
-  if (idParam && !isSpinnerMode) {
-    // Single student - API returns object with id
-    fetch(SHEET_URL + "?id=" + encodeURIComponent(idParam))
-      .then(res => res.json())
-      .then(student => {
-        if (student && student.name) {
-          displayStudent(student);
-        } else {
-          document.getElementById("studentName").innerText = "Student Not Found";
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("studentName").innerText = "Error";
-      });
-  } else {
-    // Load all students - for spinner or random
-    fetch(SHEET_URL)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          allStudents = data;
-          
-          if (isSpinnerMode) {
-            remainingStudents = [...allStudents];
-            document.getElementById('spinnerModeContainer').style.display = 'block';
-            updateRemainingCount();
-            const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-            // For array students, use their index position as photo ID
-            const studentIndex = allStudents.indexOf(randomStudent);
-            displayStudent(randomStudent, studentIndex + 2); // +2 because row 1 is headers, row 2 is first student
-          } else {
-            const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-            const studentIndex = allStudents.indexOf(randomStudent);
-            displayStudent(randomStudent, studentIndex + 2);
-          }
-        } else {
-          document.getElementById("studentName").innerText = "No Data";
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("studentName").innerText = "Connection Error";
-      });
+function revealStudent(student) {
+  displayStudent(student);
+  const resultElement = document.getElementById('spinnerResult');
+  resultElement.classList.remove('show');
+  setTimeout(() => {
+    resultElement.innerHTML = `✨ ${student.name}! ✨`;
+    resultElement.classList.add('show');
+  }, 50);
+  createFloatingHearts(12);
+  playHaptic();
+}
+
+function getRandomStudent() {
+  if (remainingStudents.length === 0 && allStudents.length > 0) {
+    remainingStudents = [...allStudents];
+    updateRemainingCount();
+    document.getElementById('spinnerResult').innerHTML = "🎊 Starting over! 🎊";
+    setTimeout(() => {
+      if (document.getElementById('spinnerResult').innerHTML === "🎊 Starting over! 🎊") {
+        document.getElementById('spinnerResult').innerHTML = "";
+      }
+    }, 1500);
   }
+  
+  if (remainingStudents.length === 0) return null;
+  
+  const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+  const student = remainingStudents[randomIndex];
+  remainingStudents.splice(randomIndex, 1);
+  updateRemainingCount();
+  return student;
+}
+
+function spinToStudent(targetStudent) {
+  if (!targetStudent) return;
+  
+  const totalStudents = allStudents.length;
+  const targetIndex = allStudents.findIndex(s => s.name === targetStudent.name);
+  if (targetIndex === -1) return;
+  
+  const segmentAngle = 360 / totalStudents;
+  const targetSegmentCenter = (targetIndex * segmentAngle) + (segmentAngle / 2);
+  
+  let targetAngle = (360 - targetSegmentCenter + 45) % 360;
+  
+  const currentRotation = wheelAngle % 360;
+  let delta = targetAngle - currentRotation;
+  if (delta < 0) delta += 360;
+  
+  const finalAngle = wheelAngle + delta + (360 * 5);
+  
+  spinning = true;
+  wheelElement.classList.add('spinning');
+  
+  const startAngle = wheelAngle;
+  const startTime = performance.now();
+  const duration = 1500;
+  
+  function animateSpin(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(1, elapsed / duration);
+    const easeOut = 1 - Math.pow(1 - t, 3);
+    const newAngle = startAngle + (finalAngle - startAngle) * easeOut;
+    wheelElement.style.transform = `rotate(${newAngle}deg)`;
+    wheelAngle = newAngle;
+    
+    if (t < 1) {
+      requestAnimationFrame(animateSpin);
+    } else {
+      wheelElement.style.transform = `rotate(${finalAngle}deg)`;
+      wheelAngle = finalAngle;
+      wheelElement.classList.remove('spinning');
+      spinning = false;
+      revealStudent(targetStudent);
+    }
+  }
+  
+  requestAnimationFrame(animateSpin);
+  playHaptic();
+}
+
+function spinRandom() {
+  if (spinning) return;
+  
+  const selectedStudent = getRandomStudent();
+  if (!selectedStudent) return;
+  
+  const totalStudents = allStudents.length;
+  const targetIndex = allStudents.findIndex(s => s.name === selectedStudent.name);
+  if (targetIndex === -1) return;
+  
+  const segmentAngle = 360 / totalStudents;
+  const targetSegmentCenter = (targetIndex * segmentAngle) + (segmentAngle / 2);
+  
+  let targetAngle = (360 - targetSegmentCenter + 45) % 360;
+  
+  const currentRotation = wheelAngle % 360;
+  let delta = targetAngle - currentRotation;
+  if (delta < 0) delta += 360;
+  
+  const extraSpins = 5 + Math.random() * 3;
+  const finalAngle = wheelAngle + delta + (360 * extraSpins);
+  
+  spinning = true;
+  wheelElement.classList.add('spinning');
+  
+  const startAngle = wheelAngle;
+  const startTime = performance.now();
+  const duration = 1500;
+  
+  function animateSpin(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(1, elapsed / duration);
+    const easeOut = 1 - Math.pow(1 - t, 3);
+    const newAngle = startAngle + (finalAngle - startAngle) * easeOut;
+    wheelElement.style.transform = `rotate(${newAngle}deg)`;
+    wheelAngle = newAngle;
+    
+    if (t < 1) {
+      requestAnimationFrame(animateSpin);
+    } else {
+      wheelElement.style.transform = `rotate(${finalAngle}deg)`;
+      wheelAngle = finalAngle;
+      wheelElement.classList.remove('spinning');
+      spinning = false;
+      revealStudent(selectedStudent);
+    }
+  }
+  
+  requestAnimationFrame(animateSpin);
+  playHaptic();
+}
+
+// Touch/Drag physics-based spinning
+function getTouchAngle(centerX, centerY, touchX, touchY) {
+  const dx = touchX - centerX;
+  const dy = touchY - centerY;
+  return Math.atan2(dy, dx) * 180 / Math.PI;
+}
+
+function startDrag(e) {
+  if (spinning) return;
+  e.preventDefault();
+  
+  const rect = wheelElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  
+  let clientX, clientY;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  
+  touchStartAngle = getTouchAngle(centerX, centerY, clientX, clientY);
+  touchStartX = clientX;
+  touchStartY = clientY;
+  isDragging = true;
+  
+  wheelElement.style.transition = 'none';
+}
+
+function onDrag(e) {
+  if (!isDragging || spinning) return;
+  e.preventDefault();
+  
+  const rect = wheelElement.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  
+  let clientX, clientY;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  
+  const currentAngle = getTouchAngle(centerX, centerY, clientX, clientY);
+  let angleDelta = currentAngle - touchStartAngle;
+  
+  wheelAngle += angleDelta;
+  wheelElement.style.transform = `rotate(${wheelAngle}deg)`;
+  
+  touchStartAngle = currentAngle;
+  touchStartX = clientX;
+  touchStartY = clientY;
+  
+  spinVelocity = angleDelta;
+  lastTimestamp = performance.now();
+}
+
+function endDrag(e) {
+  if (!isDragging || spinning) {
+    isDragging = false;
+    return;
+  }
+  isDragging = false;
+  
+  const velocity = spinVelocity;
+  
+  if (Math.abs(velocity) < 0.5) {
+    spinRandom();
+    return;
+  }
+  
+  const direction = velocity > 0 ? 1 : -1;
+  const speed = Math.min(Math.abs(velocity) * 15, 30);
+  const extraSpins = 3 + (speed / 10);
+  const targetRotation = wheelAngle + (direction * 360 * extraSpins) + (direction * 360);
+  
+  spinning = true;
+  wheelElement.classList.add('spinning');
+  wheelElement.style.transition = 'transform cubic-bezier(0.1, 0.9, 0.2, 1)';
+  
+  const startAngle = wheelAngle;
+  const startTime = performance.now();
+  const duration = Math.min(1000 + (speed * 30), 2000);
+  
+  function animateFlickSpin(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(1, elapsed / duration);
+    const easeOut = 1 - Math.pow(1 - t, 2.5);
+    const newAngle = startAngle + (targetRotation - startAngle) * easeOut;
+    wheelElement.style.transform = `rotate(${newAngle}deg)`;
+    wheelAngle = newAngle;
+    
+    if (t < 1) {
+      requestAnimationFrame(animateFlickSpin);
+    } else {
+      wheelElement.style.transform = `rotate(${targetRotation}deg)`;
+      wheelAngle = targetRotation;
+      wheelElement.style.transition = '';
+      wheelElement.classList.remove('spinning');
+      spinning = false;
+      
+      const selectedStudent = getRandomStudent();
+      if (selectedStudent) {
+        const totalStudents = allStudents.length;
+        const currentRotation = wheelAngle % 360;
+        const pointerAngle = 45;
+        let winnerAngle = (360 - currentRotation + pointerAngle) % 360;
+        const segmentAngle = 360 / totalStudents;
+        const winnerIndex = Math.floor(winnerAngle / segmentAngle) % totalStudents;
+        const actualWinner = allStudents[winnerIndex];
+        
+        if (actualWinner && remainingStudents.includes(actualWinner)) {
+          const idx = remainingStudents.indexOf(actualWinner);
+          if (idx !== -1) remainingStudents.splice(idx, 1);
+          updateRemainingCount();
+          revealStudent(actualWinner);
+        } else {
+          revealStudent(selectedStudent);
+        }
+      }
+    }
+  }
+  
+  requestAnimationFrame(animateFlickSpin);
+  playHaptic();
+}
+
+function resetWheel() {
+  if (spinning) return;
+  wheelAngle = 0;
+  wheelElement.style.transition = 'transform 0.5s ease';
+  wheelElement.style.transform = `rotate(0deg)`;
+  setTimeout(() => {
+    wheelElement.style.transition = '';
+  }, 500);
 }
 
 function updateRemainingCount() {
@@ -370,73 +662,70 @@ function updateRemainingCount() {
   if (remainingStudents.length > 0) {
     remElem.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
   } else {
-    remElem.innerHTML = '🎉 All done! Resetting... 🎉';
-    remainingStudents = [...allStudents];
+    remElem.innerHTML = '🎉 All done! Click Reset to start over 🎉';
   }
 }
 
-function spinWheel() {
-  if (isSpinning) return;
-  
-  if (remainingStudents.length === 0 && allStudents.length > 0) {
-    remainingStudents = [...allStudents];
-    document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
-    updateRemainingCount();
-    setTimeout(() => document.getElementById("spinnerResult").innerHTML = "", 1500);
-    return;
-  }
-  
-  if (remainingStudents.length === 0) return;
-  
-  isSpinning = true;
-  const wheel = document.getElementById('wheel');
-  const spinnerResult = document.getElementById('spinnerResult');
-  
-  spinnerResult.innerHTML = "🎡 Spinning... 🎡";
-  const spinDegrees = 1440 + Math.random() * 720;
-  wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
-  wheel.style.transform = `rotate(${spinDegrees}deg)`;
-  
-  setTimeout(() => {
-    const randomIndex = Math.floor(Math.random() * remainingStudents.length);
-    const selectedStudent = remainingStudents[randomIndex];
-    remainingStudents.splice(randomIndex, 1);
-    
-    spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
-    // Use the index to determine photo ID (row number in sheet)
-    const studentPosition = allStudents.indexOf(selectedStudent);
-    displayStudent(selectedStudent, studentPosition + 2);
-    
-    updateRemainingCount();
-    createFloatingHearts();
-    isSpinning = false;
-    
-    setTimeout(() => {
-      wheel.style.transition = "none";
-      const currentRotate = spinDegrees % 360;
-      wheel.style.transform = `rotate(${currentRotate}deg)`;
-      setTimeout(() => wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)", 50);
-    }, 100);
-    
-    setTimeout(() => {
-      if (spinnerResult.innerHTML !== "🎡 Spinning... 🎡") spinnerResult.innerHTML = "";
-    }, 2500);
-  }, 1500);
+function loadData() {
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        allStudents = data;
+        remainingStudents = [...allStudents];
+        
+        if (isSpinnerMode) {
+          document.getElementById('spinnerModeContainer').style.display = 'block';
+          updateRemainingCount();
+          const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
+          displayStudent(randomStudent);
+        } else if (idParam) {
+          fetch(SHEET_URL + "?id=" + encodeURIComponent(idParam))
+            .then(res => res.json())
+            .then(student => {
+              if (student && student.name) displayStudent(student);
+              else document.getElementById("studentName").innerText = "Student Not Found";
+            });
+        } else {
+          const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
+          displayStudent(randomStudent);
+        }
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("studentName").innerText = "Connection Error";
+    });
 }
 
 if (isSpinnerMode) {
   setTimeout(() => {
-    const btn = document.getElementById('spinnerBtn');
-    const wheelEl = document.getElementById('wheel');
-    if (btn) btn.addEventListener('click', spinWheel);
-    if (wheelEl) wheelEl.addEventListener('click', spinWheel);
+    wheelElement.addEventListener('mousedown', startDrag);
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('mouseup', endDrag);
+    
+    wheelElement.addEventListener('touchstart', startDrag, { passive: false });
+    window.addEventListener('touchmove', onDrag, { passive: false });
+    window.addEventListener('touchend', endDrag);
+    
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      remainingStudents = [...allStudents];
+      updateRemainingCount();
+      resetWheel();
+      document.getElementById('spinnerResult').innerHTML = "⟳ Reset! Spin again!";
+      setTimeout(() => {
+        if (document.getElementById('spinnerResult').innerHTML === "⟳ Reset! Spin again!") {
+          document.getElementById('spinnerResult').innerHTML = "";
+        }
+      }, 1500);
+    });
   }, 100);
 }
 
 loadData();
 
 setInterval(() => {
-  if (Math.random() > 0.7) createFloatingHearts();
+  if (Math.random() > 0.8) createFloatingHearts(3);
 }, 4000);
 </script>
 
