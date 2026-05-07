@@ -6,7 +6,6 @@
   <title>Happy Mother's Day</title>
 
   <style>
-    /* ===== YOUR EXACT SAME STYLES (no changes) ===== */
     * {
       margin: 0;
       padding: 0;
@@ -64,6 +63,7 @@
       50% { text-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
     }
 
+    /* Photo & name – used both in normal view and for result reveal */
     .photo {
       width: 100%;
       max-width: 300px;
@@ -132,19 +132,20 @@
       50% { opacity: 1; }
     }
 
+    /* Spinner mode styles (only visible when ?mode=spinner) */
     .spinner-section {
       margin-top: 25px;
       padding-top: 20px;
       border-top: 2px dashed #ffb6c1;
     }
 
-    /* ----- NEW TOUCH SPINNER STYLES (replaces old spinner-btn and container) ----- */
     .wheel-container {
       position: relative;
       display: inline-block;
       margin: 10px auto;
       cursor: grab;
       touch-action: none;
+      transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
     }
     .wheel-container:active {
       cursor: grabbing;
@@ -202,6 +203,38 @@
       transition: 0.2s;
     }
     .reset-btn:active { transform: scale(0.95); }
+    .spin-again-btn {
+      background: linear-gradient(135deg, #e91e63, #ff6b9d);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 40px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+    .spin-again-btn:active { transform: scale(0.96); }
+
+    /* Result card (photo+name) that appears after spin */
+    .result-card {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+      pointer-events: none;
+    }
+    .result-card.show {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+    .hidden-wheel {
+      transform: scale(0);
+      opacity: 0;
+      pointer-events: none;
+    }
 
     @media (max-width: 480px) {
       .wheel { width: 180px; height: 180px; }
@@ -226,23 +259,34 @@
 
 <div class="card">
   <h1>❤️ Happy Mother's Day ❤️</h1>
-  <img id="studentPhoto" class="photo" src="" alt="Student Photo">
-  <div class="name" id="studentName">Loading...</div>
-  <div class="message">Thank you Mom for your endless love, care and support.<br>You are the heart of our family 💖</div>
-  <div class="footer">With Love</div>
 
-  <!-- Spinner container (only visible when ?mode=spinner) -->
+  <!-- Normal / revealed content (initially visible only in normal mode) -->
+  <div id="normalContent">
+    <img id="studentPhoto" class="photo" src="" alt="Student Photo">
+    <div class="name" id="studentName">Loading...</div>
+    <div class="message">Thank you Mom for your endless love, care and support.<br>You are the heart of our family 💖</div>
+    <div class="footer">With Love</div>
+  </div>
+
+  <!-- Spinner mode container (initially hidden) -->
   <div id="spinnerModeContainer" style="display: none;">
     <div class="spinner-section">
+      <!-- Wheel area -->
       <div style="text-align: center;">
         <div class="wheel-container" id="wheelContainer">
           <div class="pointer-icon">▼</div>
           <div class="wheel" id="wheel"></div>
         </div>
-        <div class="spinner-result" id="spinnerResult"></div>
         <div class="remaining" id="remainingCount"></div>
+        <div class="spinner-result" id="spinnerResult"></div>
         <button class="reset-btn" id="resetBtn">⟳ Reset Wheel</button>
-        <div style="font-size:12px; color:#e91e63; margin-top:8px;">👇 Drag or flick the wheel!</div>
+      </div>
+
+      <!-- Result card (initially hidden, appears after spin) -->
+      <div id="resultCard" class="result-card" style="margin-top: 20px;">
+        <img id="resultPhoto" class="photo" src="" alt="">
+        <div class="name" id="resultName"></div>
+        <button class="spin-again-btn" id="spinAgainBtn">✨ Spin Again ✨</button>
       </div>
     </div>
   </div>
@@ -264,7 +308,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const idParam = urlParams.get("id");
 
-// ========== HELPER FUNCTIONS (unchanged) ==========
+// Helper: floating hearts
 function createFloatingHearts(count = 8) {
   for(let i = 0; i < count; i++) {
     setTimeout(() => {
@@ -280,23 +324,31 @@ function createFloatingHearts(count = 8) {
   }
 }
 
-function displayStudent(student, indexId = null) {
+// Display student in normal view or inside result card
+function displayStudent(student, target = 'normal') {
   if (!student) return;
-  document.getElementById("studentName").innerText = student.name;
-  const img = document.getElementById("studentPhoto");
-  let photoId = student.id || indexId || idParam || String(student.name).replace(/\s/g, '');
-  if (photoId) {
-    img.src = `photos/${photoId}.JPG`;
-    img.onerror = () => {
-      img.src = `photos/${photoId}.jpg`;
-      img.onerror = () => {
-        img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
-      };
-    };
+  if (target === 'normal') {
+    document.getElementById("studentName").innerText = student.name;
+    const img = document.getElementById("studentPhoto");
+    const photoId = student.id || idParam;
+    if (photoId) {
+      img.src = `photos/${photoId}.JPG`;
+      img.onerror = () => { img.src = `photos/${photoId}.jpg`; };
+    } else {
+      img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
+    }
   } else {
-    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
+    // result card
+    document.getElementById("resultName").innerText = student.name;
+    const rImg = document.getElementById("resultPhoto");
+    const photoId = student.id;
+    if (photoId) {
+      rImg.src = `photos/${photoId}.JPG`;
+      rImg.onerror = () => { rImg.src = `photos/${photoId}.jpg`; };
+    } else {
+      rImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
+    }
   }
-  createFloatingHearts(6);
 }
 
 function loadData() {
@@ -304,7 +356,7 @@ function loadData() {
     fetch(SHEET_URL + "?id=" + encodeURIComponent(idParam))
       .then(res => res.json())
       .then(student => {
-        if (student && student.name) displayStudent(student);
+        if (student && student.name) displayStudent(student, 'normal');
         else document.getElementById("studentName").innerText = "Student Not Found";
       })
       .catch(() => document.getElementById("studentName").innerText = "Error");
@@ -315,16 +367,18 @@ function loadData() {
         if (Array.isArray(data) && data.length > 0) {
           allStudents = data;
           if (isSpinnerMode) {
-            remainingStudents = [...allStudents];
+            // Spinner mode: hide normal content, show spinner UI
+            document.getElementById('normalContent').style.display = 'none';
             document.getElementById('spinnerModeContainer').style.display = 'block';
+            remainingStudents = [...allStudents];
             updateRemainingCount();
-            const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-            const studentIndex = allStudents.indexOf(randomStudent);
-            displayStudent(randomStudent, studentIndex + 2);
+            // Initially only wheel is visible, result card hidden
+            document.getElementById('resultCard').classList.remove('show');
+            document.getElementById('wheelContainer').classList.remove('hidden-wheel');
+            // Optionally, pick a random student as "first" but don't show it yet
           } else {
             const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-            const studentIndex = allStudents.indexOf(randomStudent);
-            displayStudent(randomStudent, studentIndex + 2);
+            displayStudent(randomStudent, 'normal');
           }
         } else {
           document.getElementById("studentName").innerText = "No Data";
@@ -344,7 +398,7 @@ function updateRemainingCount() {
   }
 }
 
-// ========== NEW TOUCH/DRAG PHYSICS SPINNER ==========
+// --- Physics spinner (exactly same as before) ---
 function getAngleFromEvent(e, centerX, centerY) {
   let clientX, clientY;
   if (e.touches) {
@@ -395,12 +449,10 @@ function onDragEnd(e) {
     return;
   }
   isDragging = false;
-  // If almost no velocity, do a random spin
   if (Math.abs(angularVelocity) < 0.3) {
     spinRandom();
     return;
   }
-  // Flick spin with momentum
   const speed = Math.min(Math.abs(angularVelocity) * 12, 25);
   const direction = angularVelocity > 0 ? 1 : -1;
   const extraRotations = 3 + (speed / 8);
@@ -421,13 +473,9 @@ function startMomentumSpin(targetRotation, speed) {
     currentAngle = targetRotation % 360;
     wheel.style.transform = `rotate(${currentAngle}deg)`;
     spinning = false;
-    // Determine winner based on final angle
+    // Determine winner
     const total = allStudents.length;
-    const pointerAngle = 0; // because pointer is at top ( -90? We'll adjust)
-    // The pointer is fixed at the top (12 o'clock). The wheel's 0deg is rightmost.
-    // We need to find which segment the pointer points to.
-    let rawAngle = (360 - (currentAngle % 360)) % 360; // rotation from pointer perspective
-    // Add offset because segment 0 starts at 0deg (right). The pointer at top is -90deg.
+    let rawAngle = (360 - (currentAngle % 360)) % 360;
     let adjustedAngle = (rawAngle + 90) % 360;
     const segment = 360 / total;
     let winnerIndex = Math.floor(adjustedAngle / segment) % total;
@@ -436,13 +484,16 @@ function startMomentumSpin(targetRotation, speed) {
       const idx = remainingStudents.indexOf(winner);
       if (idx !== -1) remainingStudents.splice(idx, 1);
       updateRemainingCount();
+      // Show result card with winner
+      displayStudent(winner, 'result');
       document.getElementById("spinnerResult").innerHTML = `✨ ${winner.name}! ✨`;
-      displayStudent(winner);
       createFloatingHearts(12);
       if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+      // Hide wheel, show result card
+      document.getElementById('wheelContainer').classList.add('hidden-wheel');
+      document.getElementById('resultCard').classList.add('show');
       setTimeout(() => {
-        if (document.getElementById("spinnerResult").innerHTML !== "🎡 Spinning...") 
-          document.getElementById("spinnerResult").innerHTML = "";
+        document.getElementById("spinnerResult").innerHTML = "";
       }, 2500);
     } else {
       spinRandom(); // fallback
@@ -464,12 +515,11 @@ function spinRandom() {
   remainingStudents.splice(randomIndex, 1);
   updateRemainingCount();
 
-  // Animate wheel to land on selected student
   const total = allStudents.length;
   const targetIndex = allStudents.findIndex(s => s.name === selected.name);
   const segment = 360 / total;
   const targetCenter = (targetIndex * segment) + (segment / 2);
-  let targetAngle = (360 - targetCenter + 90) % 360; // align with pointer at top
+  let targetAngle = (360 - targetCenter + 90) % 360;
   let currentRot = currentAngle % 360;
   let delta = targetAngle - currentRot;
   if (delta < 0) delta += 360;
@@ -477,7 +527,6 @@ function spinRandom() {
   startMomentumSpin(finalAngle, 15);
 }
 
-// Reset spinner
 function resetWheel() {
   if (spinning) return;
   currentAngle = 0;
@@ -491,19 +540,36 @@ function resetWheel() {
   updateRemainingCount();
   document.getElementById("spinnerResult").innerHTML = "⟳ Reset! Spin again!";
   setTimeout(() => document.getElementById("spinnerResult").innerHTML = "", 1500);
+  // Also reset UI: show wheel, hide result card
+  document.getElementById('wheelContainer').classList.remove('hidden-wheel');
+  document.getElementById('resultCard').classList.remove('show');
 }
 
-// ========== INITIALIZATION ==========
+// --- Spin Again: hide result, show wheel, allow new spin ---
+function spinAgain() {
+  if (spinning) return;
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('wheelContainer').classList.remove('hidden-wheel');
+  // Optionally reset wheel angle to a fresh position
+  currentAngle = 0;
+  wheel.style.transition = 'transform 0.3s ease';
+  wheel.style.transform = 'rotate(0deg)';
+  setTimeout(() => {
+    wheel.style.transition = '';
+    currentAngle = 0;
+  }, 300);
+  document.getElementById("spinnerResult").innerHTML = "";
+}
+
+// --- Initialization for spinner mode ---
 let wheel = null;
 if (isSpinnerMode) {
-  // Wait for DOM to be ready
   window.addEventListener('DOMContentLoaded', () => {
     wheel = document.getElementById('wheel');
     const container = document.getElementById('wheelContainer');
     if (!wheel) return;
     wheel.style.transform = 'rotate(0deg)';
     currentAngle = 0;
-    // Attach drag events
     container.addEventListener('mousedown', onDragStart);
     window.addEventListener('mousemove', onDragMove);
     window.addEventListener('mouseup', onDragEnd);
@@ -511,12 +577,12 @@ if (isSpinnerMode) {
     window.addEventListener('touchmove', onDragMove, { passive: false });
     window.addEventListener('touchend', onDragEnd);
     document.getElementById('resetBtn').addEventListener('click', resetWheel);
+    document.getElementById('spinAgainBtn').addEventListener('click', spinAgain);
   });
 }
 
 loadData();
 
-// Floating hearts occasionally
 setInterval(() => {
   if (Math.random() > 0.8) createFloatingHearts(3);
 }, 4000);
