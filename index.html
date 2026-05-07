@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Mother's Day</title>
+
+  <style>
+    body{
+      margin:0;
+      padding:0;
+      font-family:Arial, sans-serif;
+      background: linear-gradient(135deg,#ffdde1,#ee9ca7);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+    }
+
+    .card{
+      background:white;
+      width:90%;
+      max-width:450px;
+      border-radius:25px;
+      padding:25px;
+      text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    h1{
+      color:#e91e63;
+      margin-bottom:10px;
+    }
+
+    .photo{
+      width:220px;
+      height:220px;
+      border-radius:20px;
+      object-fit:cover;
+      border:6px solid #ffb6c1;
+      margin-top:15px;
+    }
+
+    .name{
+      font-size:28px;
+      font-weight:bold;
+      margin-top:20px;
+      color:#333;
+    }
+
+    .message{
+      font-size:18px;
+      margin-top:15px;
+      color:#555;
+      line-height:1.6;
+    }
+
+    .footer{
+      margin-top:20px;
+      color:#999;
+      font-size:14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <h1>❤️ Happy Mother's Day ❤️</h1>
+
+  <img id="studentPhoto" class="photo" src="" alt="Student Photo">
+
+  <div class="name" id="studentName">Loading...</div>
+
+  <div class="message">
+    Thank you Mom for your endless love, care and support.<br>
+    You are the heart of our family 💖
+  </div>
+
+  <div class="footer">
+    With Love
+  </div>
+
+</div>
+
+<script>
+
+const SHEET_URL = "PASTE_YOUR_GOOGLE_SCRIPT_WEBAPP_URL_HERE";
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+fetch(SHEET_URL + "?id=" + id)
+.then(res => res.json())
+.then(data => {
+
+  document.getElementById("studentName").innerText = data.name;
+
+  document.getElementById("studentPhoto").src =
+    "photos/" + id + ".jpg";
+
+})
+.catch(err => {
+  document.getElementById("studentName").innerText =
+    "Student Not Found";
+});
+
+</script>
+
+</body>
+</html>
