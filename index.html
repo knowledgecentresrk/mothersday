@@ -4,9 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Happy Mother's Day</title>
+
   <style>
-    /* --- Your CSS Styles (Keep them exactly as they were) --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #ffdde1, #ee9ca7);
@@ -17,10 +22,12 @@
       padding: 20px;
       animation: bgPulse 3s ease-in-out infinite;
     }
+
     @keyframes bgPulse {
       0%, 100% { background: linear-gradient(135deg, #ffdde1, #ee9ca7); }
       50% { background: linear-gradient(135deg, #ffe0e6, #ffb0bd); }
     }
+
     .card {
       background: rgba(255, 255, 255, 0.95);
       width: 90%;
@@ -31,40 +38,50 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
       animation: floatCard 3s ease-in-out infinite;
       backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.5);
     }
+
     @keyframes floatCard {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-8px); }
     }
+
     h1 {
       color: #e91e63;
       margin-bottom: 15px;
       font-size: 2em;
       animation: titleGlow 2s ease-in-out infinite;
+      letter-spacing: 2px;
     }
+
     @keyframes titleGlow {
       0%, 100% { text-shadow: 0 0 5px #ffb6c1, 0 0 10px #ffb6c1; }
       50% { text-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
     }
+
     .photo {
       width: 320px;
       height: 320px;
       border-radius: 25px;
-      object-fit: cover; /* ensure photo covers the area without distortion */
+      object-fit: cover;
       border: 8px solid #ffb6c1;
       margin-top: 15px;
       transition: all 0.5s ease;
       animation: photoGlow 2s ease-in-out infinite;
-      background: #f0f0f0; /* fallback background color */
-      /* use a temporary base64 fallback image */
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='14' fill='%23999'%3E📷%3C/text%3E%3C/svg%3E");
-      background-size: cover;
-      background-position: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      background: #ffe0e6;
     }
+
+    .photo:hover {
+      transform: scale(1.02);
+      border-color: #e91e63;
+    }
+
     @keyframes photoGlow {
-      0%, 100% { box-shadow: 0 0 5px #ffb6c1; }
-      50% { box-shadow: 0 0 20px #e91e63; }
+      0%, 100% { box-shadow: 0 0 5px #ffb6c1, 0 0 10px #ffb6c1; }
+      50% { box-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
     }
+
     .name {
       font-size: 32px;
       font-weight: bold;
@@ -75,10 +92,12 @@
       color: transparent;
       animation: nameWave 1.5s ease-in-out infinite;
     }
+
     @keyframes nameWave {
       0%, 100% { letter-spacing: normal; }
       50% { letter-spacing: 3px; }
     }
+
     .message {
       font-size: 18px;
       margin-top: 15px;
@@ -86,21 +105,30 @@
       line-height: 1.6;
       animation: fadeInOut 3s ease-in-out infinite;
     }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+
     .footer {
       margin-top: 20px;
       color: #999;
       font-size: 14px;
       animation: pulse 2s ease-in-out infinite;
     }
-    @keyframes fadeInOut {
-      0%, 100% { opacity: 0.8; }
-      50% { opacity: 1; }
-    }
+
     @keyframes pulse {
       0%, 100% { opacity: 0.6; }
       50% { opacity: 1; }
     }
-    .spinner-section { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #ffb6c1; }
+
+    .spinner-section {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 2px dashed #ffb6c1;
+    }
+
     .spinner-btn {
       background: linear-gradient(135deg, #e91e63, #ff6b9d);
       color: white;
@@ -116,22 +144,87 @@
       align-items: center;
       gap: 10px;
     }
-    .spinner-btn:hover { transform: scale(1.05); }
+
+    .spinner-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(233,30,99,0.6);
+    }
+
+    .spinner-btn:active {
+      transform: scale(0.95);
+    }
+
+    .spinner-container {
+      margin-top: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     .wheel {
       width: 200px;
       height: 200px;
       border-radius: 50%;
-      background: conic-gradient(from 0deg, #e91e63 0deg 45deg, #ff6b9d 45deg 90deg, #ffb6c1 90deg 135deg, #ff1493 135deg 180deg, #e91e63 180deg 225deg, #ff6b9d 225deg 270deg, #ffb6c1 270deg 315deg, #ff1493 315deg 360deg);
+      background: conic-gradient(
+        from 0deg,
+        #e91e63 0deg 45deg,
+        #ff6b9d 45deg 90deg,
+        #ffb6c1 90deg 135deg,
+        #ff1493 135deg 180deg,
+        #e91e63 180deg 225deg,
+        #ff6b9d 225deg 270deg,
+        #ffb6c1 270deg 315deg,
+        #ff1493 315deg 360deg
+      );
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
       cursor: pointer;
-      margin: 0 auto;
       position: relative;
+      animation: wheelPulse 2s ease-in-out infinite;
     }
-    .wheel::before { content: "🎡"; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 30px; }
-    .wheel::after { content: "▼"; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 25px; color: #e91e63; }
-    .spinner-result, .remaining { margin-top: 15px; font-size: 16px; color: #e91e63; font-weight: bold; }
-    .remaining { font-size: 12px; color: #999; }
+
+    @keyframes wheelPulse {
+      0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+      50% { box-shadow: 0 15px 40px rgba(233,30,99,0.5); }
+    }
+
+    .wheel::before {
+      content: "🎡";
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 30px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+    }
+
+    .wheel::after {
+      content: "▼";
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 25px;
+      color: #e91e63;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+    }
+
+    .spinner-result {
+      margin-top: 15px;
+      font-size: 16px;
+      color: #e91e63;
+      font-weight: bold;
+      min-height: 40px;
+    }
+
+    .remaining {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+    }
+
     .heart {
       position: fixed;
       font-size: 20px;
@@ -139,28 +232,16 @@
       animation: floatUp 4s ease-in forwards;
       z-index: 1000;
     }
+
     @keyframes floatUp {
-      0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
-    }
-    /* Debug panel styles */
-    .debug-info {
-      background: #f8f9fa;
-      border-radius: 12px;
-      padding: 10px;
-      margin-top: 20px;
-      text-align: left;
-      font-family: monospace;
-      font-size: 11px;
-      color: #2c3e50;
-      max-height: 150px;
-      overflow-y: auto;
-      border: 1px solid #e9ecef;
-      word-wrap: break-word;
-    }
-    .debug-info div {
-      padding: 4px 0;
-      border-bottom: 1px solid #e9ecef;
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-20vh) rotate(360deg);
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -168,14 +249,25 @@
 
 <div class="card">
   <h1>❤️ Happy Mother's Day ❤️</h1>
+
   <img id="studentPhoto" class="photo" src="" alt="Student Photo">
+
   <div class="name" id="studentName">Loading...</div>
-  <div class="message">Thank you Mom for your endless love, care and support.<br>You are the heart of our family 💖</div>
-  <div class="footer">With Love</div>
+
+  <div class="message">
+    Thank you Mom for your endless love, care and support.<br>
+    You are the heart of our family 💖
+  </div>
+
+  <div class="footer">
+    With Love
+  </div>
 
   <div id="spinnerModeContainer" style="display: none;">
     <div class="spinner-section">
-      <button class="spinner-btn" id="spinnerBtn">🎰 Spin the Wheel 🎰</button>
+      <button class="spinner-btn" id="spinnerBtn">
+        🎰 Spin the Wheel 🎰
+      </button>
       <div class="spinner-container">
         <div class="wheel" id="wheel"></div>
         <div class="spinner-result" id="spinnerResult"></div>
@@ -183,40 +275,22 @@
       </div>
     </div>
   </div>
-
-  <!-- Debugging information panel -->
-  <div id="debugInfo" class="debug-info"></div>
 </div>
 
 <script>
-// ======================= CONFIGURATION =======================
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTAI9jNz5_f1zmHltGgYztCN2fkrQpvaXjuJslX2vOHquKoLi2zLfVF0v-NPvQZQ56/execL";
+// YOUR APPS SCRIPT URL
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTAI9jNz5_f1zmHltGgYztCN2fkrQpvaXjuJslX2vOHquKoLi2zLfVF0v-NPvQZQ56/exec";
 
-// Global variables
 let allStudents = [];
 let remainingStudents = [];
 let isSpinning = false;
 
-// Get URL parameters
 const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const id = urlParams.get("id");
 
-// Debug function (logs to console and debug panel)
-function debugLog(msg) {
-  console.log(msg);
-  const debugDiv = document.getElementById('debugInfo');
-  if (debugDiv) {
-    const logDiv = document.createElement('div');
-    logDiv.textContent = `🔍 ${new Date().toLocaleTimeString()}: ${msg}`;
-    debugDiv.appendChild(logDiv);
-    debugDiv.scrollTop = debugDiv.scrollHeight;
-  }
-}
-
-// ======================= HELPER FUNCTIONS =======================
 function createFloatingHearts() {
-  for(let i = 0; i < 3; i++) { // limit to 3 hearts per burst to reduce clutter
+  for(let i = 0; i < 5; i++) {
     setTimeout(() => {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -231,190 +305,141 @@ function createFloatingHearts() {
 }
 
 function displayStudent(student) {
-  if (!student) {
-    debugLog("displayStudent called with null/undefined");
-    return;
-  }
-
-  debugLog(`Displaying student: ID=${student.id}, Name=${student.name}`);
-  const nameElement = document.getElementById("studentName");
-  if (nameElement) nameElement.innerText = student.name;
-
+  if (!student) return;
+  
+  document.getElementById("studentName").innerText = student.name;
+  
+  // Photo path - your photos are .JPG uppercase
   const img = document.getElementById("studentPhoto");
-  if (img) {
-    // First, set a fallback color/pattern
-    img.style.backgroundColor = '#f0f0f0';
-    img.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='14' fill='%23999'%3E📷%3C/text%3E%3C/svg%3E")`;
-
-    // Try the correct photo path (case-sensitive)
-    const photoPath = `photos/${student.id}.JPG`;
-    debugLog(`Attempting to load photo from: ${photoPath}`);
-    img.src = photoPath;
-    img.onload = () => debugLog(`✅ Successfully loaded: ${photoPath}`);
-    img.onerror = () => debugLog(`❌ Failed to load: ${photoPath} (file may not exist in 'photos/' folder or filename case mismatch)`);
-  } else {
-    debugLog("Error: Could not find 'studentPhoto' element");
-  }
-
+  img.src = `photos/${student.id}.JPG`;
+  
+  // If photo fails to load, show a simple emoji placeholder
+  img.onerror = function() {
+    this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
+  };
+  
   createFloatingHearts();
 }
 
-// ======================= DATA FETCHING =======================
 function loadStudentData() {
   let url = SHEET_URL;
   if (id && !isSpinnerMode) {
     url = SHEET_URL + "?id=" + encodeURIComponent(id);
-    debugLog(`Fetching single student: ${url}`);
-  } else {
-    debugLog(`Fetching all students: ${url}`);
   }
-
+  
   fetch(url)
-    .then(response => {
-      debugLog(`HTTP status: ${response.status}`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response.json();
-    })
+    .then(res => res.json())
     .then(data => {
-      debugLog(`Received data type: ${Array.isArray(data) ? 'Array' : typeof data}`);
-      debugLog(`Data sample: ${JSON.stringify(data).substring(0, 200)}`);
-
-      // Case 1: Single student object (when ?id=xxx is used)
+      // Handle single student (when ID provided)
       if (data && data.name && !Array.isArray(data)) {
-        debugLog(`Single student mode: ${data.name}`);
         allStudents = [data];
         displayStudent(data);
       }
-      // Case 2: Array of students (when no id or spinner mode)
+      // Handle array of students
       else if (Array.isArray(data) && data.length > 0) {
-        debugLog(`Array mode: ${data.length} students found`);
         allStudents = data;
-
+        
         if (isSpinnerMode) {
-          debugLog("Spinner mode active - showing wheel");
           remainingStudents = [...allStudents];
-          const spinnerModeContainer = document.getElementById('spinnerModeContainer');
-          if (spinnerModeContainer) spinnerModeContainer.style.display = 'block';
+          document.getElementById('spinnerModeContainer').style.display = 'block';
           updateRemainingCount();
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
           displayStudent(randomStudent);
-        } else if (id) {
+        } 
+        else if (id) {
           const student = allStudents.find(s => String(s.id) === String(id));
           if (student) {
-            debugLog(`Found student with ID ${id}: ${student.name}`);
             displayStudent(student);
           } else {
-            debugLog(`Student ID ${id} not found in data`);
             document.getElementById("studentName").innerText = "Student Not Found";
-            // Keep the default fallback for photo
           }
-        } else {
-          // random student
+        } 
+        else {
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-          debugLog(`No ID, showing random: ${randomStudent.name}`);
           displayStudent(randomStudent);
         }
-      } else {
-        debugLog("No valid data received");
-        document.getElementById("studentName").innerText = "No Data Available";
       }
     })
     .catch(err => {
-      debugLog(`FETCH ERROR: ${err.message}`);
-      document.getElementById("studentName").innerText = "Connection Error";
+      console.error(err);
+      document.getElementById("studentName").innerText = "Welcome!";
     });
 }
 
-// ======================= SPINNER LOGIC =======================
 function updateRemainingCount() {
-  const remainingElem = document.getElementById('remainingCount');
-  if (!remainingElem) return;
+  const remElem = document.getElementById('remainingCount');
   if (remainingStudents.length > 0) {
-    remainingElem.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
+    remElem.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
   } else {
-    remainingElem.innerHTML = '🎉 All done! Resetting... 🎉';
+    remElem.innerHTML = '🎉 All done! Resetting... 🎉';
     remainingStudents = [...allStudents];
   }
 }
 
 function spinWheel() {
   if (isSpinning) return;
+  
   if (remainingStudents.length === 0 && allStudents.length > 0) {
     remainingStudents = [...allStudents];
-    const spinnerResultElem = document.getElementById('spinnerResult');
-    if (spinnerResultElem) spinnerResultElem.innerHTML = "🎊 Starting over! 🎊";
+    document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
     updateRemainingCount();
     setTimeout(() => {
-      if (spinnerResultElem) spinnerResultElem.innerHTML = "";
+      document.getElementById("spinnerResult").innerHTML = "";
     }, 1500);
     return;
   }
-
-  if (remainingStudents.length === 0) {
-    debugLog("No students to spin");
-    return;
-  }
-
+  
+  if (remainingStudents.length === 0) return;
+  
   isSpinning = true;
   const wheel = document.getElementById('wheel');
   const spinnerResult = document.getElementById('spinnerResult');
-
-  if (spinnerResult) spinnerResult.innerHTML = "🎡 Spinning... 🎡";
+  
+  spinnerResult.innerHTML = "🎡 Spinning... 🎡";
   const spinDegrees = 1440 + Math.random() * 720;
-  if (wheel) {
-    wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
-    wheel.style.transform = `rotate(${spinDegrees}deg)`;
-  }
-
+  wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
+  wheel.style.transform = `rotate(${spinDegrees}deg)`;
+  
   setTimeout(() => {
     const randomIndex = Math.floor(Math.random() * remainingStudents.length);
     const selectedStudent = remainingStudents[randomIndex];
     remainingStudents.splice(randomIndex, 1);
-
-    if (spinnerResult) spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
+    
+    spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
     displayStudent(selectedStudent);
     updateRemainingCount();
     createFloatingHearts();
     isSpinning = false;
-
-    // Reset wheel
-    if (wheel) {
-      setTimeout(() => {
-        wheel.style.transition = "none";
-        const currentRotate = spinDegrees % 360;
-        wheel.style.transform = `rotate(${currentRotate}deg)`;
-        setTimeout(() => {
-          wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)";
-        }, 50);
-      }, 100);
-    }
-
+    
     setTimeout(() => {
-      if (spinnerResult && spinnerResult.innerHTML !== "🎡 Spinning... 🎡") {
+      wheel.style.transition = "none";
+      const currentRotate = spinDegrees % 360;
+      wheel.style.transform = `rotate(${currentRotate}deg)`;
+      setTimeout(() => {
+        wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)";
+      }, 50);
+    }, 100);
+    
+    setTimeout(() => {
+      if (spinnerResult.innerHTML !== "🎡 Spinning... 🎡") {
         spinnerResult.innerHTML = "";
       }
     }, 2500);
   }, 1500);
 }
 
-// ======================= INIT =======================
 if (isSpinnerMode) {
   setTimeout(() => {
-    const spinnerBtn = document.getElementById('spinnerBtn');
-    const wheelElement = document.getElementById('wheel');
-    if (spinnerBtn) spinnerBtn.addEventListener('click', spinWheel);
-    if (wheelElement) wheelElement.addEventListener('click', spinWheel);
-    debugLog("Spinner event listeners attached");
+    document.getElementById('spinnerBtn').addEventListener('click', spinWheel);
+    document.getElementById('wheel').addEventListener('click', spinWheel);
   }, 100);
 }
 
-// Start loading data
 loadStudentData();
 
-// Continuous floating hearts effect (every few seconds)
 setInterval(() => {
   if (Math.random() > 0.7) createFloatingHearts();
-}, 4000);
+}, 3000);
 </script>
 
 </body>
