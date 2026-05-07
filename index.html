@@ -29,6 +29,7 @@
       0%, 100% { background: linear-gradient(135deg, #ffdde1, #ee9ca7); }
       50% { background: linear-gradient(135deg, #ffe0e6, #ffb0bd); }
     }
+    body { animation: bgPulse 3s ease-in-out infinite; }
 
     .card {
       background: rgba(255, 255, 255, 0.95);
@@ -56,7 +57,6 @@
       font-size: 1.8em;
       animation: titleGlow 2s ease-in-out infinite;
       letter-spacing: 1px;
-      word-break: keep-all;
     }
 
     @keyframes titleGlow {
@@ -100,7 +100,6 @@
       color: transparent;
       animation: nameWave 1.5s ease-in-out infinite;
       word-break: break-word;
-      padding: 0 10px;
     }
 
     @keyframes nameWave {
@@ -114,12 +113,11 @@
       color: #555;
       line-height: 1.5;
       animation: fadeInOut 3s ease-in-out infinite;
-      padding: 0 10px;
     }
 
     @keyframes fadeInOut {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.01); }
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
     }
 
     .footer {
@@ -154,8 +152,6 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      width: auto;
-      max-width: 100%;
     }
 
     .spinner-btn:hover {
@@ -212,7 +208,6 @@
       left: 50%;
       transform: translateX(-50%);
       font-size: 28px;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
     }
 
     .wheel::after {
@@ -223,7 +218,6 @@
       transform: translateX(-50%);
       font-size: 22px;
       color: #e91e63;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
     }
 
     .spinner-result {
@@ -232,8 +226,6 @@
       color: #e91e63;
       font-weight: bold;
       min-height: 40px;
-      word-break: break-word;
-      padding: 0 10px;
     }
 
     .remaining {
@@ -261,42 +253,15 @@
       }
     }
 
-    /* Mobile fixes */
     @media (max-width: 480px) {
-      .card {
-        padding: 20px 15px;
-      }
-      
-      h1 {
-        font-size: 1.5em;
-      }
-      
-      .photo {
-        max-width: 260px;
-      }
-      
-      .name {
-        font-size: 24px;
-      }
-      
-      .message {
-        font-size: 14px;
-      }
-      
-      .wheel {
-        width: 150px;
-        height: 150px;
-      }
-      
-      .wheel::before {
-        font-size: 24px;
-        top: -25px;
-      }
-      
-      .wheel::after {
-        font-size: 18px;
-        top: -12px;
-      }
+      .card { padding: 20px 15px; }
+      h1 { font-size: 1.5em; }
+      .photo { max-width: 260px; }
+      .name { font-size: 24px; }
+      .message { font-size: 14px; }
+      .wheel { width: 150px; height: 150px; }
+      .wheel::before { font-size: 24px; top: -25px; }
+      .wheel::after { font-size: 18px; top: -12px; }
     }
   </style>
 </head>
@@ -358,12 +323,18 @@ function createFloatingHearts() {
   }
 }
 
-function displayStudent(student) {
+function displayStudent(student, studentIdFromUrl = null) {
   if (!student) return;
   
   document.getElementById("studentName").innerText = student.name;
   
-  const studentId = student.admissionNumber || student.id;
+  // Get the ID - either from the student object or from URL parameter
+  let studentId = student.id || student.admissionNumber;
+  
+  // If no ID in student object but we have URL parameter, use that
+  if (!studentId && studentIdFromUrl) {
+    studentId = studentIdFromUrl;
+  }
   
   if (studentId) {
     const img = document.getElementById("studentPhoto");
@@ -378,26 +349,18 @@ function displayStudent(student) {
 
 function loadStudentData() {
   let url = SHEET_URL;
-  if (id && !isSpinnerMode) {
-    url = SHEET_URL + "?id=" + encodeURIComponent(id);
-  }
   
   fetch(url)
     .then(res => res.json())
     .then(data => {
-      console.log("Data:", data);
+      console.log("Data from API:", data);
       
-      if (data && data.name && !Array.isArray(data)) {
-        if (!data.id && !data.admissionNumber && id) {
-          data.admissionNumber = id;
-        }
-        allStudents = [data];
-        displayStudent(data);
-      }
-      else if (Array.isArray(data) && data.length > 0) {
+      // Handle array of students (spinner mode or no ID)
+      if (Array.isArray(data) && data.length > 0) {
         allStudents = data;
         
         if (isSpinnerMode) {
+          // Spinner mode - show the wheel
           remainingStudents = [...allStudents];
           document.getElementById('spinnerModeContainer').style.display = 'block';
           updateRemainingCount();
@@ -405,24 +368,32 @@ function loadStudentData() {
           displayStudent(randomStudent);
         } 
         else if (id) {
-          const student = allStudents.find(s => String(s.id) === String(id) || String(s.admissionNumber) === String(id));
+          // Normal mode with ID - find student by matching name or index
+          // Since API doesn't return IDs in array, we use the URL ID to get the photo
+          const student = allStudents.find(s => String(s.name).toLowerCase() === String(id)) || allStudents[0];
           if (student) {
-            displayStudent(student);
+            displayStudent(student, id);
           } else {
             document.getElementById("studentName").innerText = "Student Not Found";
           }
         } 
         else {
+          // No ID, no spinner - show random
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
           displayStudent(randomStudent);
         }
       }
+      // Handle single student object (when API returns object)
+      else if (data && data.name) {
+        allStudents = [data];
+        displayStudent(data, id);
+      }
       else {
-        document.getElementById("studentName").innerText = "No Data";
+        document.getElementById("studentName").innerText = "No Data Found";
       }
     })
     .catch(err => {
-      console.error(err);
+      console.error("Fetch error:", err);
       document.getElementById("studentName").innerText = "Welcome!";
     });
 }
@@ -489,6 +460,7 @@ function spinWheel() {
   }, 1500);
 }
 
+// Setup spinner event listeners
 if (isSpinnerMode) {
   setTimeout(() => {
     const btn = document.getElementById('spinnerBtn');
@@ -498,8 +470,10 @@ if (isSpinnerMode) {
   }, 100);
 }
 
+// Load data
 loadStudentData();
 
+// Floating hearts every few seconds
 setInterval(() => {
   if (Math.random() > 0.7) createFloatingHearts();
 }, 4000);
