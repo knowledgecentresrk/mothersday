@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Happy Mother's Day</title>
-
   <style>
+    /* --- Your CSS Styles (Keep them exactly as they were) --- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -50,12 +50,16 @@
       width: 320px;
       height: 320px;
       border-radius: 25px;
-      object-fit: cover;
+      object-fit: cover; /* ensure photo covers the area without distortion */
       border: 8px solid #ffb6c1;
       margin-top: 15px;
       transition: all 0.5s ease;
       animation: photoGlow 2s ease-in-out infinite;
-      background: #f0f0f0;
+      background: #f0f0f0; /* fallback background color */
+      /* use a temporary base64 fallback image */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='14' fill='%23999'%3E📷%3C/text%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
     }
     @keyframes photoGlow {
       0%, 100% { box-shadow: 0 0 5px #ffb6c1; }
@@ -75,14 +79,25 @@
       0%, 100% { letter-spacing: normal; }
       50% { letter-spacing: 3px; }
     }
-    .message, .footer {
+    .message {
+      font-size: 18px;
       margin-top: 15px;
       color: #555;
+      line-height: 1.6;
       animation: fadeInOut 3s ease-in-out infinite;
     }
-    .footer { margin-top: 20px; color: #999; font-size: 14px; }
+    .footer {
+      margin-top: 20px;
+      color: #999;
+      font-size: 14px;
+      animation: pulse 2s ease-in-out infinite;
+    }
     @keyframes fadeInOut {
       0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
       50% { opacity: 1; }
     }
     .spinner-section { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #ffb6c1; }
@@ -128,7 +143,25 @@
       0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
       100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
     }
-    .debug-info { background: #f0f0f0; padding: 8px; margin-top: 15px; border-radius: 8px; font-size: 11px; color: #666; word-break: break-all; }
+    /* Debug panel styles */
+    .debug-info {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 20px;
+      text-align: left;
+      font-family: monospace;
+      font-size: 11px;
+      color: #2c3e50;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #e9ecef;
+      word-wrap: break-word;
+    }
+    .debug-info div {
+      padding: 4px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
   </style>
 </head>
 <body>
@@ -151,13 +184,13 @@
     </div>
   </div>
 
-  <!-- Debug panel (will show errors/messages) -->
+  <!-- Debugging information panel -->
   <div id="debugInfo" class="debug-info"></div>
 </div>
 
 <script>
 // ======================= CONFIGURATION =======================
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwTAI9jNz5_f1zmHltGgYztCN2fkrQpvaXjuJslX2vOHquKoLi2zLfVF0v-NPvQZQ56/exec";
+const SHEET_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
 
 // Global variables
 let allStudents = [];
@@ -169,19 +202,21 @@ const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const id = urlParams.get("id");
 
-// Debug function
+// Debug function (logs to console and debug panel)
 function debugLog(msg) {
   console.log(msg);
   const debugDiv = document.getElementById('debugInfo');
   if (debugDiv) {
-    debugDiv.innerHTML += `<div>🔍 ${new Date().toLocaleTimeString()}: ${msg}</div>`;
+    const logDiv = document.createElement('div');
+    logDiv.textContent = `🔍 ${new Date().toLocaleTimeString()}: ${msg}`;
+    debugDiv.appendChild(logDiv);
     debugDiv.scrollTop = debugDiv.scrollHeight;
   }
 }
 
 // ======================= HELPER FUNCTIONS =======================
 function createFloatingHearts() {
-  for(let i = 0; i < 5; i++) {
+  for(let i = 0; i < 3; i++) { // limit to 3 hearts per burst to reduce clutter
     setTimeout(() => {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -200,45 +235,27 @@ function displayStudent(student) {
     debugLog("displayStudent called with null/undefined");
     return;
   }
-  
+
   debugLog(`Displaying student: ID=${student.id}, Name=${student.name}`);
-  document.getElementById("studentName").innerText = student.name;
-  
+  const nameElement = document.getElementById("studentName");
+  if (nameElement) nameElement.innerText = student.name;
+
   const img = document.getElementById("studentPhoto");
-  // Try multiple paths and extensions
-  const possiblePaths = [
-    `photos/${student.id}.JPG`,
-    `photos/${student.id}.jpg`,
-    `photos/${student.id}.png`,
-    `photos/${student.id}.jpeg`,
-    `${student.id}.JPG`,
-    `${student.id}.jpg`,
-    `https://via.placeholder.com/320x320?text=${encodeURIComponent(student.name)}`
-  ];
-  
-  let attempt = 0;
-  
-  function tryNextPath() {
-    if (attempt >= possiblePaths.length) {
-      debugLog("All photo paths failed, using placeholder");
-      img.src = possiblePaths[possiblePaths.length - 1];
-      return;
-    }
-    const path = possiblePaths[attempt];
-    debugLog(`Trying photo path: ${path}`);
-    img.src = path;
-    attempt++;
+  if (img) {
+    // First, set a fallback color/pattern
+    img.style.backgroundColor = '#f0f0f0';
+    img.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='14' fill='%23999'%3E📷%3C/text%3E%3C/svg%3E")`;
+
+    // Try the correct photo path (case-sensitive)
+    const photoPath = `photos/${student.id}.JPG`;
+    debugLog(`Attempting to load photo from: ${photoPath}`);
+    img.src = photoPath;
+    img.onload = () => debugLog(`✅ Successfully loaded: ${photoPath}`);
+    img.onerror = () => debugLog(`❌ Failed to load: ${photoPath} (file may not exist in 'photos/' folder or filename case mismatch)`);
+  } else {
+    debugLog("Error: Could not find 'studentPhoto' element");
   }
-  
-  img.onerror = function() {
-    debugLog(`Failed to load: ${img.src}`);
-    tryNextPath();
-  };
-  img.onload = function() {
-    debugLog(`Successfully loaded: ${img.src}`);
-  };
-  tryNextPath();
-  
+
   createFloatingHearts();
 }
 
@@ -251,7 +268,7 @@ function loadStudentData() {
   } else {
     debugLog(`Fetching all students: ${url}`);
   }
-  
+
   fetch(url)
     .then(response => {
       debugLog(`HTTP status: ${response.status}`);
@@ -261,22 +278,23 @@ function loadStudentData() {
     .then(data => {
       debugLog(`Received data type: ${Array.isArray(data) ? 'Array' : typeof data}`);
       debugLog(`Data sample: ${JSON.stringify(data).substring(0, 200)}`);
-      
-      // Case: single student object (response from ?id=xxx)
+
+      // Case 1: Single student object (when ?id=xxx is used)
       if (data && data.name && !Array.isArray(data)) {
         debugLog(`Single student mode: ${data.name}`);
         allStudents = [data];
         displayStudent(data);
       }
-      // Case: array of students (response from no id or spinner)
+      // Case 2: Array of students (when no id or spinner mode)
       else if (Array.isArray(data) && data.length > 0) {
         debugLog(`Array mode: ${data.length} students found`);
         allStudents = data;
-        
+
         if (isSpinnerMode) {
           debugLog("Spinner mode active - showing wheel");
           remainingStudents = [...allStudents];
-          document.getElementById('spinnerModeContainer').style.display = 'block';
+          const spinnerModeContainer = document.getElementById('spinnerModeContainer');
+          if (spinnerModeContainer) spinnerModeContainer.style.display = 'block';
           updateRemainingCount();
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
           displayStudent(randomStudent);
@@ -288,7 +306,7 @@ function loadStudentData() {
           } else {
             debugLog(`Student ID ${id} not found in data`);
             document.getElementById("studentName").innerText = "Student Not Found";
-            document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=❌+Not+Found";
+            // Keep the default fallback for photo
           }
         } else {
           // random student
@@ -299,19 +317,18 @@ function loadStudentData() {
       } else {
         debugLog("No valid data received");
         document.getElementById("studentName").innerText = "No Data Available";
-        document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=📭+No+Data";
       }
     })
     .catch(err => {
       debugLog(`FETCH ERROR: ${err.message}`);
       document.getElementById("studentName").innerText = "Connection Error";
-      document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=⚠️+Error";
     });
 }
 
 // ======================= SPINNER LOGIC =======================
 function updateRemainingCount() {
   const remainingElem = document.getElementById('remainingCount');
+  if (!remainingElem) return;
   if (remainingStudents.length > 0) {
     remainingElem.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
   } else {
@@ -324,51 +341,56 @@ function spinWheel() {
   if (isSpinning) return;
   if (remainingStudents.length === 0 && allStudents.length > 0) {
     remainingStudents = [...allStudents];
-    document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
+    const spinnerResultElem = document.getElementById('spinnerResult');
+    if (spinnerResultElem) spinnerResultElem.innerHTML = "🎊 Starting over! 🎊";
     updateRemainingCount();
     setTimeout(() => {
-      document.getElementById("spinnerResult").innerHTML = "";
+      if (spinnerResultElem) spinnerResultElem.innerHTML = "";
     }, 1500);
     return;
   }
-  
+
   if (remainingStudents.length === 0) {
     debugLog("No students to spin");
     return;
   }
-  
+
   isSpinning = true;
   const wheel = document.getElementById('wheel');
   const spinnerResult = document.getElementById('spinnerResult');
-  
-  spinnerResult.innerHTML = "🎡 Spinning... 🎡";
+
+  if (spinnerResult) spinnerResult.innerHTML = "🎡 Spinning... 🎡";
   const spinDegrees = 1440 + Math.random() * 720;
-  wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
-  wheel.style.transform = `rotate(${spinDegrees}deg)`;
-  
+  if (wheel) {
+    wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
+    wheel.style.transform = `rotate(${spinDegrees}deg)`;
+  }
+
   setTimeout(() => {
     const randomIndex = Math.floor(Math.random() * remainingStudents.length);
     const selectedStudent = remainingStudents[randomIndex];
     remainingStudents.splice(randomIndex, 1);
-    
-    spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
+
+    if (spinnerResult) spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
     displayStudent(selectedStudent);
     updateRemainingCount();
     createFloatingHearts();
     isSpinning = false;
-    
+
     // Reset wheel
-    setTimeout(() => {
-      wheel.style.transition = "none";
-      const currentRotate = spinDegrees % 360;
-      wheel.style.transform = `rotate(${currentRotate}deg)`;
+    if (wheel) {
       setTimeout(() => {
-        wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)";
-      }, 50);
-    }, 100);
-    
+        wheel.style.transition = "none";
+        const currentRotate = spinDegrees % 360;
+        wheel.style.transform = `rotate(${currentRotate}deg)`;
+        setTimeout(() => {
+          wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)";
+        }, 50);
+      }, 100);
+    }
+
     setTimeout(() => {
-      if (spinnerResult.innerHTML !== "🎡 Spinning... 🎡") {
+      if (spinnerResult && spinnerResult.innerHTML !== "🎡 Spinning... 🎡") {
         spinnerResult.innerHTML = "";
       }
     }, 2500);
@@ -386,11 +408,13 @@ if (isSpinnerMode) {
   }, 100);
 }
 
+// Start loading data
 loadStudentData();
 
+// Continuous floating hearts effect (every few seconds)
 setInterval(() => {
   if (Math.random() > 0.7) createFloatingHearts();
-}, 3000);
+}, 4000);
 </script>
 
 </body>
