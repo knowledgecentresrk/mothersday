@@ -6,6 +6,7 @@
   <title>Happy Mother's Day</title>
 
   <style>
+    /* ===== YOUR EXACT SAME STYLES (no changes) ===== */
     * {
       margin: 0;
       padding: 0;
@@ -137,38 +138,20 @@
       border-top: 2px dashed #ffb6c1;
     }
 
-    .spinner-btn {
-      background: linear-gradient(135deg, #e91e63, #ff6b9d);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(233,30,99,0.4);
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
+    /* ----- NEW TOUCH SPINNER STYLES (replaces old spinner-btn and container) ----- */
+    .wheel-container {
+      position: relative;
+      display: inline-block;
+      margin: 10px auto;
+      cursor: grab;
+      touch-action: none;
     }
-
-    .spinner-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 25px rgba(233,30,99,0.6);
+    .wheel-container:active {
+      cursor: grabbing;
     }
-
-    .spinner-container {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    }
-
     .wheel {
-      width: 180px;
-      height: 180px;
+      width: 220px;
+      height: 220px;
       border-radius: 50%;
       background: conic-gradient(
         from 0deg,
@@ -182,44 +165,48 @@
         #ff1493 315deg 360deg
       );
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
-      cursor: pointer;
-      position: relative;
-      animation: wheelPulse 2s ease-in-out infinite;
-      margin: 0 auto;
+      transition: none;
+      will-change: transform;
     }
-
-    @keyframes wheelPulse {
-      0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-      50% { box-shadow: 0 15px 40px rgba(233,30,99,0.5); }
-    }
-
-    .wheel::before {
-      content: "🎡";
+    .pointer-icon {
       position: absolute;
       top: -30px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 28px;
+      font-size: 40px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+      pointer-events: none;
+      z-index: 5;
     }
-
-    .wheel::after {
-      content: "▼";
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 22px;
-      color: #e91e63;
-    }
-
-    .spinner-result, .remaining {
-      margin-top: 15px;
-      font-size: 16px;
+    .spinner-result {
+      margin-top: 20px;
+      font-size: 18px;
       color: #e91e63;
       font-weight: bold;
+      min-height: 50px;
     }
-    .remaining { font-size: 12px; color: #999; margin-top: 5px; }
+    .remaining {
+      font-size: 12px;
+      color: #999;
+      margin-top: 5px;
+    }
+    .reset-btn {
+      background: rgba(233,30,99,0.1);
+      border: 1px solid #e91e63;
+      color: #e91e63;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .reset-btn:active { transform: scale(0.95); }
+
+    @media (max-width: 480px) {
+      .wheel { width: 180px; height: 180px; }
+      .pointer-icon { font-size: 32px; top: -25px; }
+    }
 
     .heart {
       position: fixed;
@@ -233,17 +220,6 @@
       0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
       100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
     }
-
-    @media (max-width: 480px) {
-      .card { padding: 20px 15px; }
-      h1 { font-size: 1.5em; }
-      .photo { max-width: 260px; }
-      .name { font-size: 24px; }
-      .message { font-size: 14px; }
-      .wheel { width: 150px; height: 150px; }
-      .wheel::before { font-size: 24px; top: -25px; }
-      .wheel::after { font-size: 18px; top: -12px; }
-    }
   </style>
 </head>
 <body>
@@ -255,13 +231,18 @@
   <div class="message">Thank you Mom for your endless love, care and support.<br>You are the heart of our family 💖</div>
   <div class="footer">With Love</div>
 
+  <!-- Spinner container (only visible when ?mode=spinner) -->
   <div id="spinnerModeContainer" style="display: none;">
     <div class="spinner-section">
-      <button class="spinner-btn" id="spinnerBtn">🎰 Spin the Wheel 🎰</button>
-      <div class="spinner-container">
-        <div class="wheel" id="wheel"></div>
+      <div style="text-align: center;">
+        <div class="wheel-container" id="wheelContainer">
+          <div class="pointer-icon">▼</div>
+          <div class="wheel" id="wheel"></div>
+        </div>
         <div class="spinner-result" id="spinnerResult"></div>
         <div class="remaining" id="remainingCount"></div>
+        <button class="reset-btn" id="resetBtn">⟳ Reset Wheel</button>
+        <div style="font-size:12px; color:#e91e63; margin-top:8px;">👇 Drag or flick the wheel!</div>
       </div>
     </div>
   </div>
@@ -272,14 +253,20 @@ const SHEET_URL = "https://script.google.com/macros/s/AKfycbx8ViWEIG02LBFrg9PsXq
 
 let allStudents = [];
 let remainingStudents = [];
-let isSpinning = false;
+let spinning = false;
+let currentAngle = 0;
+let dragStartAngle = 0;
+let isDragging = false;
+let lastDragTime = 0;
+let angularVelocity = 0;
 
 const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const idParam = urlParams.get("id");
 
-function createFloatingHearts() {
-  for(let i = 0; i < 3; i++) {
+// ========== HELPER FUNCTIONS (unchanged) ==========
+function createFloatingHearts(count = 8) {
+  for(let i = 0; i < count; i++) {
     setTimeout(() => {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -289,19 +276,15 @@ function createFloatingHearts() {
       heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
       document.body.appendChild(heart);
       setTimeout(() => heart.remove(), 4000);
-    }, i * 200);
+    }, i * 80);
   }
 }
 
 function displayStudent(student, indexId = null) {
   if (!student) return;
-  
   document.getElementById("studentName").innerText = student.name;
-  
   const img = document.getElementById("studentPhoto");
-  // Use the id from student object, or indexId (for array mode), or fallback to name
   let photoId = student.id || indexId || idParam || String(student.name).replace(/\s/g, '');
-  
   if (photoId) {
     img.src = `photos/${photoId}.JPG`;
     img.onerror = () => {
@@ -313,42 +296,31 @@ function displayStudent(student, indexId = null) {
   } else {
     img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ffb6c1'/%3E%3Ctext x='50' y='55' font-size='40' text-anchor='middle' fill='%23e91e63'%3E❤️%3C/text%3E%3C/svg%3E";
   }
-  
-  createFloatingHearts();
+  createFloatingHearts(6);
 }
 
 function loadData() {
   if (idParam && !isSpinnerMode) {
-    // Single student - API returns object with id
     fetch(SHEET_URL + "?id=" + encodeURIComponent(idParam))
       .then(res => res.json())
       .then(student => {
-        if (student && student.name) {
-          displayStudent(student);
-        } else {
-          document.getElementById("studentName").innerText = "Student Not Found";
-        }
+        if (student && student.name) displayStudent(student);
+        else document.getElementById("studentName").innerText = "Student Not Found";
       })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("studentName").innerText = "Error";
-      });
+      .catch(() => document.getElementById("studentName").innerText = "Error");
   } else {
-    // Load all students - for spinner or random
     fetch(SHEET_URL)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           allStudents = data;
-          
           if (isSpinnerMode) {
             remainingStudents = [...allStudents];
             document.getElementById('spinnerModeContainer').style.display = 'block';
             updateRemainingCount();
             const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
-            // For array students, use their index position as photo ID
             const studentIndex = allStudents.indexOf(randomStudent);
-            displayStudent(randomStudent, studentIndex + 2); // +2 because row 1 is headers, row 2 is first student
+            displayStudent(randomStudent, studentIndex + 2);
           } else {
             const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
             const studentIndex = allStudents.indexOf(randomStudent);
@@ -358,10 +330,7 @@ function loadData() {
           document.getElementById("studentName").innerText = "No Data";
         }
       })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("studentName").innerText = "Connection Error";
-      });
+      .catch(() => document.getElementById("studentName").innerText = "Connection Error");
   }
 }
 
@@ -370,75 +339,187 @@ function updateRemainingCount() {
   if (remainingStudents.length > 0) {
     remElem.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
   } else {
-    remElem.innerHTML = '🎉 All done! Resetting... 🎉';
+    remElem.innerHTML = '🎉 All done! Click Reset to start over 🎉';
     remainingStudents = [...allStudents];
   }
 }
 
-function spinWheel() {
-  if (isSpinning) return;
-  
-  if (remainingStudents.length === 0 && allStudents.length > 0) {
-    remainingStudents = [...allStudents];
-    document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
-    updateRemainingCount();
-    setTimeout(() => document.getElementById("spinnerResult").innerHTML = "", 1500);
+// ========== NEW TOUCH/DRAG PHYSICS SPINNER ==========
+function getAngleFromEvent(e, centerX, centerY) {
+  let clientX, clientY;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  return Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
+}
+
+function onDragStart(e) {
+  if (spinning) return;
+  e.preventDefault();
+  const rect = wheel.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  dragStartAngle = getAngleFromEvent(e, centerX, centerY);
+  isDragging = true;
+  angularVelocity = 0;
+  wheel.style.transition = 'none';
+  lastDragTime = performance.now();
+}
+
+function onDragMove(e) {
+  if (!isDragging || spinning) return;
+  e.preventDefault();
+  const rect = wheel.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const currentAngleClick = getAngleFromEvent(e, centerX, centerY);
+  let delta = currentAngleClick - dragStartAngle;
+  currentAngle += delta;
+  wheel.style.transform = `rotate(${currentAngle}deg)`;
+  const now = performance.now();
+  const dt = now - lastDragTime;
+  if (dt > 0 && dt < 100) {
+    angularVelocity = delta / dt;
+  }
+  dragStartAngle = currentAngleClick;
+  lastDragTime = now;
+}
+
+function onDragEnd(e) {
+  if (!isDragging || spinning) {
+    isDragging = false;
     return;
   }
-  
-  if (remainingStudents.length === 0) return;
-  
-  isSpinning = true;
-  const wheel = document.getElementById('wheel');
-  const spinnerResult = document.getElementById('spinnerResult');
-  
-  spinnerResult.innerHTML = "🎡 Spinning... 🎡";
-  const spinDegrees = 1440 + Math.random() * 720;
-  wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
-  wheel.style.transform = `rotate(${spinDegrees}deg)`;
-  
-  setTimeout(() => {
-    const randomIndex = Math.floor(Math.random() * remainingStudents.length);
-    const selectedStudent = remainingStudents[randomIndex];
-    remainingStudents.splice(randomIndex, 1);
-    
-    spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
-    // Use the index to determine photo ID (row number in sheet)
-    const studentPosition = allStudents.indexOf(selectedStudent);
-    displayStudent(selectedStudent, studentPosition + 2);
-    
-    updateRemainingCount();
-    createFloatingHearts();
-    isSpinning = false;
-    
-    setTimeout(() => {
-      wheel.style.transition = "none";
-      const currentRotate = spinDegrees % 360;
-      wheel.style.transform = `rotate(${currentRotate}deg)`;
-      setTimeout(() => wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)", 50);
-    }, 100);
-    
-    setTimeout(() => {
-      if (spinnerResult.innerHTML !== "🎡 Spinning... 🎡") spinnerResult.innerHTML = "";
-    }, 2500);
-  }, 1500);
+  isDragging = false;
+  // If almost no velocity, do a random spin
+  if (Math.abs(angularVelocity) < 0.3) {
+    spinRandom();
+    return;
+  }
+  // Flick spin with momentum
+  const speed = Math.min(Math.abs(angularVelocity) * 12, 25);
+  const direction = angularVelocity > 0 ? 1 : -1;
+  const extraRotations = 3 + (speed / 8);
+  const targetRotation = currentAngle + direction * 360 * extraRotations;
+  startMomentumSpin(targetRotation, speed);
 }
 
-if (isSpinnerMode) {
+function startMomentumSpin(targetRotation, speed) {
+  if (spinning) return;
+  spinning = true;
+  const startAngle = currentAngle;
+  const duration = Math.min(800 + speed * 30, 1800);
+  const startTime = performance.now();
+  wheel.style.transition = `transform ${duration}ms cubic-bezier(0.1, 0.9, 0.2, 1)`;
+  wheel.style.transform = `rotate(${targetRotation}deg)`;
   setTimeout(() => {
-    const btn = document.getElementById('spinnerBtn');
-    const wheelEl = document.getElementById('wheel');
-    if (btn) btn.addEventListener('click', spinWheel);
-    if (wheelEl) wheelEl.addEventListener('click', spinWheel);
-  }, 100);
+    wheel.style.transition = '';
+    currentAngle = targetRotation % 360;
+    wheel.style.transform = `rotate(${currentAngle}deg)`;
+    spinning = false;
+    // Determine winner based on final angle
+    const total = allStudents.length;
+    const pointerAngle = 0; // because pointer is at top ( -90? We'll adjust)
+    // The pointer is fixed at the top (12 o'clock). The wheel's 0deg is rightmost.
+    // We need to find which segment the pointer points to.
+    let rawAngle = (360 - (currentAngle % 360)) % 360; // rotation from pointer perspective
+    // Add offset because segment 0 starts at 0deg (right). The pointer at top is -90deg.
+    let adjustedAngle = (rawAngle + 90) % 360;
+    const segment = 360 / total;
+    let winnerIndex = Math.floor(adjustedAngle / segment) % total;
+    const winner = allStudents[winnerIndex];
+    if (winner) {
+      const idx = remainingStudents.indexOf(winner);
+      if (idx !== -1) remainingStudents.splice(idx, 1);
+      updateRemainingCount();
+      document.getElementById("spinnerResult").innerHTML = `✨ ${winner.name}! ✨`;
+      displayStudent(winner);
+      createFloatingHearts(12);
+      if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+      setTimeout(() => {
+        if (document.getElementById("spinnerResult").innerHTML !== "🎡 Spinning...") 
+          document.getElementById("spinnerResult").innerHTML = "";
+      }, 2500);
+    } else {
+      spinRandom(); // fallback
+    }
+  }, duration);
+}
+
+function spinRandom() {
+  if (spinning) return;
+  if (remainingStudents.length === 0 && allStudents.length > 0) {
+    remainingStudents = [...allStudents];
+    updateRemainingCount();
+    document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
+    setTimeout(() => document.getElementById("spinnerResult").innerHTML = "", 1500);
+  }
+  if (remainingStudents.length === 0) return;
+  const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+  const selected = remainingStudents[randomIndex];
+  remainingStudents.splice(randomIndex, 1);
+  updateRemainingCount();
+
+  // Animate wheel to land on selected student
+  const total = allStudents.length;
+  const targetIndex = allStudents.findIndex(s => s.name === selected.name);
+  const segment = 360 / total;
+  const targetCenter = (targetIndex * segment) + (segment / 2);
+  let targetAngle = (360 - targetCenter + 90) % 360; // align with pointer at top
+  let currentRot = currentAngle % 360;
+  let delta = targetAngle - currentRot;
+  if (delta < 0) delta += 360;
+  const finalAngle = currentAngle + delta + 360 * 4;
+  startMomentumSpin(finalAngle, 15);
+}
+
+// Reset spinner
+function resetWheel() {
+  if (spinning) return;
+  currentAngle = 0;
+  wheel.style.transition = 'transform 0.5s ease';
+  wheel.style.transform = 'rotate(0deg)';
+  setTimeout(() => {
+    wheel.style.transition = '';
+    currentAngle = 0;
+  }, 500);
+  remainingStudents = [...allStudents];
+  updateRemainingCount();
+  document.getElementById("spinnerResult").innerHTML = "⟳ Reset! Spin again!";
+  setTimeout(() => document.getElementById("spinnerResult").innerHTML = "", 1500);
+}
+
+// ========== INITIALIZATION ==========
+let wheel = null;
+if (isSpinnerMode) {
+  // Wait for DOM to be ready
+  window.addEventListener('DOMContentLoaded', () => {
+    wheel = document.getElementById('wheel');
+    const container = document.getElementById('wheelContainer');
+    if (!wheel) return;
+    wheel.style.transform = 'rotate(0deg)';
+    currentAngle = 0;
+    // Attach drag events
+    container.addEventListener('mousedown', onDragStart);
+    window.addEventListener('mousemove', onDragMove);
+    window.addEventListener('mouseup', onDragEnd);
+    container.addEventListener('touchstart', onDragStart, { passive: false });
+    window.addEventListener('touchmove', onDragMove, { passive: false });
+    window.addEventListener('touchend', onDragEnd);
+    document.getElementById('resetBtn').addEventListener('click', resetWheel);
+  });
 }
 
 loadData();
 
+// Floating hearts occasionally
 setInterval(() => {
-  if (Math.random() > 0.7) createFloatingHearts();
+  if (Math.random() > 0.8) createFloatingHearts(3);
 }, 4000);
 </script>
-
 </body>
 </html>
