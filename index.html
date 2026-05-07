@@ -6,12 +6,7 @@
   <title>Happy Mother's Day</title>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #ffdde1, #ee9ca7);
@@ -22,12 +17,10 @@
       padding: 20px;
       animation: bgPulse 3s ease-in-out infinite;
     }
-
     @keyframes bgPulse {
       0%, 100% { background: linear-gradient(135deg, #ffdde1, #ee9ca7); }
       50% { background: linear-gradient(135deg, #ffe0e6, #ffb0bd); }
     }
-
     .card {
       background: rgba(255, 255, 255, 0.95);
       width: 90%;
@@ -38,27 +31,21 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
       animation: floatCard 3s ease-in-out infinite;
       backdrop-filter: blur(5px);
-      border: 1px solid rgba(255,255,255,0.5);
     }
-
     @keyframes floatCard {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-8px); }
     }
-
     h1 {
       color: #e91e63;
       margin-bottom: 15px;
       font-size: 2em;
       animation: titleGlow 2s ease-in-out infinite;
-      letter-spacing: 2px;
     }
-
     @keyframes titleGlow {
       0%, 100% { text-shadow: 0 0 5px #ffb6c1, 0 0 10px #ffb6c1; }
       50% { text-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
     }
-
     .photo {
       width: 320px;
       height: 320px;
@@ -68,19 +55,12 @@
       margin-top: 15px;
       transition: all 0.5s ease;
       animation: photoGlow 2s ease-in-out infinite;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      background: #f0f0f0;
     }
-
-    .photo:hover {
-      transform: scale(1.02);
-      border-color: #e91e63;
-    }
-
     @keyframes photoGlow {
-      0%, 100% { box-shadow: 0 0 5px #ffb6c1, 0 0 10px #ffb6c1; }
-      50% { box-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
+      0%, 100% { box-shadow: 0 0 5px #ffb6c1; }
+      50% { box-shadow: 0 0 20px #e91e63; }
     }
-
     .name {
       font-size: 32px;
       font-weight: bold;
@@ -91,43 +71,21 @@
       color: transparent;
       animation: nameWave 1.5s ease-in-out infinite;
     }
-
     @keyframes nameWave {
       0%, 100% { letter-spacing: normal; }
       50% { letter-spacing: 3px; }
     }
-
-    .message {
-      font-size: 18px;
+    .message, .footer {
       margin-top: 15px;
       color: #555;
-      line-height: 1.6;
       animation: fadeInOut 3s ease-in-out infinite;
     }
-
+    .footer { margin-top: 20px; color: #999; font-size: 14px; }
     @keyframes fadeInOut {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.02); }
-    }
-
-    .footer {
-      margin-top: 20px;
-      color: #999;
-      font-size: 14px;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
+      0%, 100% { opacity: 0.8; }
       50% { opacity: 1; }
     }
-
-    .spinner-section {
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 2px dashed #ffb6c1;
-    }
-
+    .spinner-section { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #ffb6c1; }
     .spinner-btn {
       background: linear-gradient(135deg, #e91e63, #ff6b9d);
       color: white;
@@ -143,87 +101,22 @@
       align-items: center;
       gap: 10px;
     }
-
-    .spinner-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 25px rgba(233,30,99,0.6);
-    }
-
-    .spinner-btn:active {
-      transform: scale(0.95);
-    }
-
-    .spinner-container {
-      margin-top: 20px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
+    .spinner-btn:hover { transform: scale(1.05); }
     .wheel {
       width: 200px;
       height: 200px;
       border-radius: 50%;
-      background: conic-gradient(
-        from 0deg,
-        #e91e63 0deg 45deg,
-        #ff6b9d 45deg 90deg,
-        #ffb6c1 90deg 135deg,
-        #ff1493 135deg 180deg,
-        #e91e63 180deg 225deg,
-        #ff6b9d 225deg 270deg,
-        #ffb6c1 270deg 315deg,
-        #ff1493 315deg 360deg
-      );
+      background: conic-gradient(from 0deg, #e91e63 0deg 45deg, #ff6b9d 45deg 90deg, #ffb6c1 90deg 135deg, #ff1493 135deg 180deg, #e91e63 180deg 225deg, #ff6b9d 225deg 270deg, #ffb6c1 270deg 315deg, #ff1493 315deg 360deg);
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
       cursor: pointer;
+      margin: 0 auto;
       position: relative;
-      animation: wheelPulse 2s ease-in-out infinite;
     }
-
-    @keyframes wheelPulse {
-      0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-      50% { box-shadow: 0 15px 40px rgba(233,30,99,0.5); }
-    }
-
-    .wheel::before {
-      content: "🎡";
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 30px;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
-    }
-
-    .wheel::after {
-      content: "▼";
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 25px;
-      color: #e91e63;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
-    }
-
-    .spinner-result {
-      margin-top: 15px;
-      font-size: 16px;
-      color: #e91e63;
-      font-weight: bold;
-      min-height: 40px;
-    }
-
-    .remaining {
-      font-size: 12px;
-      color: #999;
-      margin-top: 10px;
-    }
-
+    .wheel::before { content: "🎡"; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 30px; }
+    .wheel::after { content: "▼"; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 25px; color: #e91e63; }
+    .spinner-result, .remaining { margin-top: 15px; font-size: 16px; color: #e91e63; font-weight: bold; }
+    .remaining { font-size: 12px; color: #999; }
     .heart {
       position: fixed;
       font-size: 20px;
@@ -231,50 +124,35 @@
       animation: floatUp 4s ease-in forwards;
       z-index: 1000;
     }
-
     @keyframes floatUp {
-      0% {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-20vh) rotate(360deg);
-        opacity: 0;
-      }
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
     }
+    .debug-info { background: #f0f0f0; padding: 8px; margin-top: 15px; border-radius: 8px; font-size: 11px; color: #666; word-break: break-all; }
   </style>
 </head>
 <body>
 
 <div class="card">
   <h1>❤️ Happy Mother's Day ❤️</h1>
-
   <img id="studentPhoto" class="photo" src="" alt="Student Photo">
-
   <div class="name" id="studentName">Loading...</div>
+  <div class="message">Thank you Mom for your endless love, care and support.<br>You are the heart of our family 💖</div>
+  <div class="footer">With Love</div>
 
-  <div class="message">
-    Thank you Mom for your endless love, care and support.<br>
-    You are the heart of our family 💖
-  </div>
-
-  <div class="footer">
-    With Love
-  </div>
-
-  <!-- Spinner Mode Container (hidden by default) -->
   <div id="spinnerModeContainer" style="display: none;">
     <div class="spinner-section">
-      <button class="spinner-btn" id="spinnerBtn">
-        🎰 Spin the Wheel 🎰
-      </button>
-      <div class="spinner-container" id="spinnerContainer">
+      <button class="spinner-btn" id="spinnerBtn">🎰 Spin the Wheel 🎰</button>
+      <div class="spinner-container">
         <div class="wheel" id="wheel"></div>
         <div class="spinner-result" id="spinnerResult"></div>
         <div class="remaining" id="remainingCount"></div>
       </div>
     </div>
   </div>
+
+  <!-- Debug panel (will show errors/messages) -->
+  <div id="debugInfo" class="debug-info"></div>
 </div>
 
 <script>
@@ -291,9 +169,19 @@ const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const id = urlParams.get("id");
 
+// Debug function
+function debugLog(msg) {
+  console.log(msg);
+  const debugDiv = document.getElementById('debugInfo');
+  if (debugDiv) {
+    debugDiv.innerHTML += `<div>🔍 ${new Date().toLocaleTimeString()}: ${msg}</div>`;
+    debugDiv.scrollTop = debugDiv.scrollHeight;
+  }
+}
+
 // ======================= HELPER FUNCTIONS =======================
 function createFloatingHearts() {
-  for (let i = 0; i < 5; i++) {
+  for(let i = 0; i < 5; i++) {
     setTimeout(() => {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -308,29 +196,49 @@ function createFloatingHearts() {
 }
 
 function displayStudent(student) {
-  if (!student) return;
-
+  if (!student) {
+    debugLog("displayStudent called with null/undefined");
+    return;
+  }
+  
+  debugLog(`Displaying student: ID=${student.id}, Name=${student.name}`);
   document.getElementById("studentName").innerText = student.name;
+  
   const img = document.getElementById("studentPhoto");
-  const basePath = `photos/${student.id}`;
-
-  // Try .JPG first (uppercase, because your photos are .JPG)
-  const extensions = ['.JPG', '.jpg', '.png', '.jpeg'];
-  let currentExt = 0;
-
-  function tryNext() {
-    if (currentExt >= extensions.length) {
-      // Fallback placeholder
-      img.src = `https://via.placeholder.com/320x320?text=${encodeURIComponent(student.name || '❤️')}`;
+  // Try multiple paths and extensions
+  const possiblePaths = [
+    `photos/${student.id}.JPG`,
+    `photos/${student.id}.jpg`,
+    `photos/${student.id}.png`,
+    `photos/${student.id}.jpeg`,
+    `${student.id}.JPG`,
+    `${student.id}.jpg`,
+    `https://via.placeholder.com/320x320?text=${encodeURIComponent(student.name)}`
+  ];
+  
+  let attempt = 0;
+  
+  function tryNextPath() {
+    if (attempt >= possiblePaths.length) {
+      debugLog("All photo paths failed, using placeholder");
+      img.src = possiblePaths[possiblePaths.length - 1];
       return;
     }
-    img.src = basePath + extensions[currentExt];
-    currentExt++;
+    const path = possiblePaths[attempt];
+    debugLog(`Trying photo path: ${path}`);
+    img.src = path;
+    attempt++;
   }
-
-  img.onerror = tryNext;
-  tryNext();
-
+  
+  img.onerror = function() {
+    debugLog(`Failed to load: ${img.src}`);
+    tryNextPath();
+  };
+  img.onload = function() {
+    debugLog(`Successfully loaded: ${img.src}`);
+  };
+  tryNextPath();
+  
   createFloatingHearts();
 }
 
@@ -339,51 +247,63 @@ function loadStudentData() {
   let url = SHEET_URL;
   if (id && !isSpinnerMode) {
     url = SHEET_URL + "?id=" + encodeURIComponent(id);
+    debugLog(`Fetching single student: ${url}`);
+  } else {
+    debugLog(`Fetching all students: ${url}`);
   }
-
+  
   fetch(url)
-    .then(res => res.json())
+    .then(response => {
+      debugLog(`HTTP status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
     .then(data => {
-      console.log("Data from Apps Script:", data);
-
-      // Case 1: single student object (when ?id=xxx was used)
+      debugLog(`Received data type: ${Array.isArray(data) ? 'Array' : typeof data}`);
+      debugLog(`Data sample: ${JSON.stringify(data).substring(0, 200)}`);
+      
+      // Case: single student object (response from ?id=xxx)
       if (data && data.name && !Array.isArray(data)) {
+        debugLog(`Single student mode: ${data.name}`);
         allStudents = [data];
         displayStudent(data);
       }
-      // Case 2: array of students (when no id or spinner mode)
+      // Case: array of students (response from no id or spinner)
       else if (Array.isArray(data) && data.length > 0) {
+        debugLog(`Array mode: ${data.length} students found`);
         allStudents = data;
-
+        
         if (isSpinnerMode) {
-          // Spinner mode: show wheel and pick random first student
+          debugLog("Spinner mode active - showing wheel");
           remainingStudents = [...allStudents];
           document.getElementById('spinnerModeContainer').style.display = 'block';
           updateRemainingCount();
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
           displayStudent(randomStudent);
         } else if (id) {
-          // Normal mode with ID: find the specific student
           const student = allStudents.find(s => String(s.id) === String(id));
           if (student) {
+            debugLog(`Found student with ID ${id}: ${student.name}`);
             displayStudent(student);
           } else {
+            debugLog(`Student ID ${id} not found in data`);
             document.getElementById("studentName").innerText = "Student Not Found";
             document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=❌+Not+Found";
           }
         } else {
-          // Normal mode without ID: random student
+          // random student
           const randomStudent = allStudents[Math.floor(Math.random() * allStudents.length)];
+          debugLog(`No ID, showing random: ${randomStudent.name}`);
           displayStudent(randomStudent);
         }
       } else {
-        // No valid data
+        debugLog("No valid data received");
         document.getElementById("studentName").innerText = "No Data Available";
         document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=📭+No+Data";
       }
     })
     .catch(err => {
-      console.error("Fetch error:", err);
+      debugLog(`FETCH ERROR: ${err.message}`);
       document.getElementById("studentName").innerText = "Connection Error";
       document.getElementById("studentPhoto").src = "https://via.placeholder.com/320x320?text=⚠️+Error";
     });
@@ -396,15 +316,13 @@ function updateRemainingCount() {
     remainingElem.innerHTML = `🎯 ${remainingStudents.length} student${remainingStudents.length !== 1 ? 's' : ''} remaining`;
   } else {
     remainingElem.innerHTML = '🎉 All done! Resetting... 🎉';
-    remainingStudents = [...allStudents]; // reset
+    remainingStudents = [...allStudents];
   }
 }
 
 function spinWheel() {
   if (isSpinning) return;
-
-  // If no students left to reveal, reset
-  if (remainingStudents.length === 0) {
+  if (remainingStudents.length === 0 && allStudents.length > 0) {
     remainingStudents = [...allStudents];
     document.getElementById("spinnerResult").innerHTML = "🎊 Starting over! 🎊";
     updateRemainingCount();
@@ -413,31 +331,33 @@ function spinWheel() {
     }, 1500);
     return;
   }
-
+  
+  if (remainingStudents.length === 0) {
+    debugLog("No students to spin");
+    return;
+  }
+  
   isSpinning = true;
   const wheel = document.getElementById('wheel');
   const spinnerResult = document.getElementById('spinnerResult');
-
+  
   spinnerResult.innerHTML = "🎡 Spinning... 🎡";
-  const spinDegrees = 1440 + Math.random() * 720; // multiple full rotations + random
+  const spinDegrees = 1440 + Math.random() * 720;
   wheel.style.transition = "transform 1.5s cubic-bezier(0.33, 1, 0.68, 1)";
   wheel.style.transform = `rotate(${spinDegrees}deg)`;
-
+  
   setTimeout(() => {
-    // Choose random student from remaining list (no repeats until reset)
     const randomIndex = Math.floor(Math.random() * remainingStudents.length);
     const selectedStudent = remainingStudents[randomIndex];
-
-    // Remove from remaining array so it won't be picked again
     remainingStudents.splice(randomIndex, 1);
-
+    
     spinnerResult.innerHTML = `✨ ${selectedStudent.name}! ✨`;
     displayStudent(selectedStudent);
     updateRemainingCount();
     createFloatingHearts();
     isSpinning = false;
-
-    // Reset wheel rotation visually for next spin
+    
+    // Reset wheel
     setTimeout(() => {
       wheel.style.transition = "none";
       const currentRotate = spinDegrees % 360;
@@ -446,8 +366,7 @@ function spinWheel() {
         wheel.style.transition = "transform 0.5s cubic-bezier(0.33, 1, 0.68, 1)";
       }, 50);
     }, 100);
-
-    // Clear result message after 2.5 seconds
+    
     setTimeout(() => {
       if (spinnerResult.innerHTML !== "🎡 Spinning... 🎡") {
         spinnerResult.innerHTML = "";
@@ -456,21 +375,19 @@ function spinWheel() {
   }, 1500);
 }
 
-// ======================= INITIALIZATION =======================
-// Only attach spinner event listeners if we are in spinner mode
+// ======================= INIT =======================
 if (isSpinnerMode) {
   setTimeout(() => {
     const spinnerBtn = document.getElementById('spinnerBtn');
     const wheelElement = document.getElementById('wheel');
     if (spinnerBtn) spinnerBtn.addEventListener('click', spinWheel);
     if (wheelElement) wheelElement.addEventListener('click', spinWheel);
+    debugLog("Spinner event listeners attached");
   }, 100);
 }
 
-// Start loading data
 loadStudentData();
 
-// Continuous floating hearts effect (every few seconds)
 setInterval(() => {
   if (Math.random() > 0.7) createFloatingHearts();
 }, 3000);
