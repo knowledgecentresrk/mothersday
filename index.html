@@ -64,17 +64,17 @@
       50% { text-shadow: 0 0 20px #e91e63, 0 0 30px #ff69b4; }
     }
 
-    /* Normal content (used only for ?id=... mode) */
+    /* Normal content – portrait‑friendly photo */
     .normal-content {
       transition: all 0.3s ease;
     }
     .photo {
-      width: 100%;
-      max-width: 300px;
+      width: auto;
+      max-width: 280px;
       height: auto;
-      aspect-ratio: 1 / 1;
-      border-radius: 25px;
-      object-fit: cover;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 20px;
       border: 6px solid #ffb6c1;
       margin: 15px auto 0;
       transition: all 0.5s ease;
@@ -206,7 +206,7 @@
     }
     .reset-btn:active { transform: scale(0.96); }
 
-    /* Result card – portrait‑friendly photo (full image visible) */
+    /* Result card – portrait photo (full image) */
     .result-card {
       position: absolute;
       top: 0;
@@ -232,7 +232,6 @@
       transform: scale(1) rotateY(0deg);
       pointer-events: auto;
     }
-    /* Portrait photo – shows entire image without cropping */
     .result-photo {
       width: auto;
       max-width: 220px;
@@ -270,7 +269,6 @@
     }
     .spin-again-btn:active { transform: scale(0.96); }
 
-    /* Hide wheel container */
     .hidden-wheel {
       opacity: 0;
       transform: scale(0.5);
@@ -281,6 +279,7 @@
     @media (max-width: 480px) {
       .wheel { width: 210px; height: 210px; }
       .pointer-icon { font-size: 38px; top: -30px; }
+      .photo { max-width: 220px; max-height: 260px; }
       .result-photo { max-width: 170px; max-height: 210px; }
       .result-name { font-size: 24px; }
     }
@@ -319,7 +318,6 @@
           <div class="pointer-icon">▼</div>
           <div class="wheel" id="wheel"></div>
         </div>
-        <!-- Result card – portrait photo appears here -->
         <div class="result-card" id="resultCard">
           <img id="resultPhoto" class="result-photo" src="" alt="">
           <div class="result-name" id="resultName"></div>
@@ -350,7 +348,6 @@ const urlParams = new URLSearchParams(window.location.search);
 const isSpinnerMode = urlParams.get("mode") === "spinner";
 const idParam = urlParams.get("id");
 
-// Floating hearts
 function createFloatingHearts(count = 12) {
   for(let i = 0; i < count; i++) {
     setTimeout(() => {
@@ -366,7 +363,6 @@ function createFloatingHearts(count = 12) {
   }
 }
 
-// Display student in normal view
 function displayNormalStudent(student) {
   if (!student) return;
   document.getElementById("studentName").innerText = student.name;
@@ -380,7 +376,6 @@ function displayNormalStudent(student) {
   }
 }
 
-// Display student in result card (spinner mode)
 function displayResultStudent(student) {
   if (!student) return;
   document.getElementById("resultName").innerText = student.name;
@@ -414,7 +409,6 @@ function loadData() {
             document.getElementById('spinnerModeContainer').style.display = 'block';
             remainingStudents = [...allStudents];
             updateRemainingCount();
-            // Hide result card, show wheel
             document.getElementById('resultCard').classList.remove('show');
             document.getElementById('wheelContainer').classList.remove('hidden-wheel');
           } else {
@@ -439,7 +433,6 @@ function updateRemainingCount() {
   }
 }
 
-// --- Physics spinner (faster, bigger rotations) ---
 function getAngleFromEvent(e, centerX, centerY) {
   let clientX, clientY;
   if (e.touches) {
